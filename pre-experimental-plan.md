@@ -42,7 +42,7 @@ To ensure objectivity and reduce bias, we will conduct a blind assessment of rip
 Here is the color scale we will use:
 ![Color Scale](./images/color_scale.jpg)
 
-We will have 3 blind taste tester.
+We will have 3 blind taste testers.
 
 ### Data Covariates
 For each banana, we will record the following attributes:
