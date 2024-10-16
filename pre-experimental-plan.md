@@ -36,8 +36,23 @@ The experiment will thus have the following sample sizes for each treatment:
 
 ### Evaluation
 To ensure objectivity and reduce bias, we will conduct a blind assessment of ripeness using two methods:
-1. **Color Scale:** Rating each banana on a scale from 1 (greenest) to 5 (darkest).
+1. **Color Scale:** Rating each banana on a scale from 1 (greenest) to 6 (darkest).
 2. **Taste Test:** Blindly rating the flavor of each banana on a scale from 1 (least ripe) to 5 (most ripe).
+
+Here is the color scale we will use:
+![Color Scale](./images/color_scale.jpg)
+
+We will have 3 blind taste tester.
+
+### Data Covariates
+For each banana, we will record the following attributes:
+ - ID: identifier
+ - row (shelf number)
+ - column (position within shelf)
+ - hole treatment: H, NH
+ - liquid treatment: NL, DC, M
+ - color: 1 to 6 (from colorscale above)
+ - taste_j: taste 1 through 5 from taster j
 
 ### Analysis
 After the experiment, we will analyze the collected data to determine the impact of each treatment on the ripening process. Specifically, we will examine both marginal effects—isolating the impact of each individual treatment (poking holes or submerging in liquid)—and joint effects, which consider the combined influence of multiple treatments. This approach will help us understand how different treatment combinations interact to affect the ripening process.
