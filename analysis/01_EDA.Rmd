@@ -1,0 +1,228 @@
+---
+title: "01_EDA"
+author: "Julian Bernado, Paolo Borello, Feifan Jiang, Judy Wu"
+date: "2024-10-17"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+```{r}
+# # Set seed for reproducibility
+# set.seed(123)
+# 
+# # Constants
+# n_bananas <- 30  # Total number of bananas
+# n_rows <- 5      # Number of rows (shelves)
+# n_treatments <- 6  # Number of distinct treatment combinations
+# 
+# # Treatment levels
+# hole_treatment_levels <- c("NH", "H")  # NH = No Holes, H = Holes
+# liquid_treatment_levels <- c("NL", "DC", "M")  # NL = No Liquid, DC = Diet Coke, M = Milk
+# 
+# # Generate all combinations of hole and liquid treatments
+# treatments <- expand.grid(hole_treatment = hole_treatment_levels, 
+#                           liquid_treatment = liquid_treatment_levels)
+# 
+# # Create a dataframe to store randomized treatments for each row
+# banana_data <- data.frame(
+#   ID = 1:n_bananas,  # Banana ID
+#   row = rep(1:n_rows, each = n_treatments),  # Shelf number (row)
+#   column = rep(1:n_treatments, times = n_rows)  # Position on the shelf (column)
+# )
+# 
+# # Randomize treatments within each row (shelf)
+# banana_data <- banana_data %>%
+#   group_by(row) %>%
+#   mutate(
+#     treatment_idx = sample(1:n_treatments, n_treatments),  # Randomize treatment indices within each row
+#     hole_treatment = treatments$hole_treatment[treatment_idx],  # Assign randomized hole treatment
+#     liquid_treatment = treatments$liquid_treatment[treatment_idx]  # Assign randomized liquid treatment
+#   ) %>%
+#   ungroup()
+# 
+# # Add synthetic color and taste ratings
+# banana_data$color <- sample(1:6, n_bananas, replace = TRUE)  # Color scale: 1 (greenest) to 6 (darkest)
+# banana_data$taste_1 <- sample(1:5, n_bananas, replace = TRUE)  # Taste rating from tester 1
+# banana_data$taste_2 <- sample(1:5, n_bananas, replace = TRUE)  # Taste rating from tester 2
+# banana_data$taste_3 <- sample(1:5, n_bananas, replace = TRUE)  # Taste rating from tester 3
+# 
+# write.csv(banana_data, file = "../data/banana_data.csv", row.names = FALSE)
+
+banana_data <- read.csv("../data/banana_data.csv")
+```
+
+```{r}
+# Create the heatmap using ggplot2
+ggplot(banana_data, aes(x = factor(column), y = factor(row), fill = factor(color))) +
+  geom_tile(color = "white") +  # Create the heatmap tiles
+  scale_fill_viridis_d(name = "Color Scale", option = "C", direction = -1) +  # Use a nice color scale (viridis)
+  labs(
+    title = "Heatmap of Banana Ripeness (Color Scale) Over Row and Column",
+    x = "Column (Position on Shelf)",
+    y = "Row (Shelf Number)"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 0, hjust = 1),  # Rotate x-axis labels for clarity
+    plot.title = element_text(hjust = 0.5)  # Center the plot title
+  )
+```
+
+```{r}
+# Calculate the average taste for each banana
+banana_data <- banana_data %>%
+  mutate(taste_avg = (taste_1 + taste_2 + taste_3) / 3)
+
+# Reshape the data to long format to facilitate faceting with ggplot2
+taste_long_df <- banana_data %>%
+  select(ID, row, column, taste_1, taste_2, taste_3, taste_avg) %>%
+  pivot_longer(cols = starts_with("taste"), 
+               names_to = "Taster", 
+               values_to = "Taste")
+
+# Replace taste_1, taste_2, taste_3 with readable labels
+taste_long_df$Taster <- recode(taste_long_df$Taster, 
+                               taste_1 = "Taster 1", 
+                               taste_2 = "Taster 2", 
+                               taste_3 = "Taster 3", 
+                               taste_avg = "Average Taste")
+
+# Plot the faceted heatmaps using ggplot2
+ggplot(taste_long_df, aes(x = factor(column), y = factor(row), fill = Taste)) +
+  geom_tile(color = "white") +  # Create the heatmap tiles
+  scale_fill_viridis_c(name = "Taste Rating", option = "C", direction = 1) +  # Color scale
+  labs(
+    title = "Heatmaps of Taste Ratings by Row and Column",
+    x = "Column (Position on Shelf)",
+    y = "Row (Shelf Number)"
+  ) +
+  facet_wrap(~ Taster, ncol = 2) +  # Facet by Taster and Average Taste
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 0, hjust = 1),  # Rotate x-axis labels for clarity
+    plot.title = element_text(hjust = 0.5)  # Center the plot title
+  )
+```
+
+```{r}
+# Calculate the average taste and color for each taster and overall by treatment (hole + liquid)
+avg_by_treatment <- banana_data %>%
+  group_by(hole_treatment, liquid_treatment) %>%
+  summarise(
+    avg_taste_1 = mean(taste_1),
+    avg_taste_2 = mean(taste_2),
+    avg_taste_3 = mean(taste_3),
+    avg_taste_all = mean(c(taste_1, taste_2, taste_3)),  # Average across all tasters
+    avg_color = mean(color),
+    .groups = "drop"
+  )
+
+# Reshape the data into long format to facilitate faceting
+avg_long_df <- avg_by_treatment %>%
+  pivot_longer(cols = starts_with("avg_taste"), 
+               names_to = "Taster", 
+               values_to = "Taste")
+
+# Replace avg_taste_1, avg_taste_2, avg_taste_3 with readable labels
+avg_long_df$Taster <- recode(avg_long_df$Taster, 
+                             avg_taste_1 = "Taster 1", 
+                             avg_taste_2 = "Taster 2", 
+                             avg_taste_3 = "Taster 3", 
+                             avg_taste_all = "Average Taste")
+```
+
+```{r}
+# Plot the faceted heatmaps for each taster's average taste rating and overall average by treatment
+ggplot(avg_long_df, aes(x = liquid_treatment, y = hole_treatment, fill = Taste)) +
+  geom_tile(color = "white") +  # Create the heatmap tiles
+  scale_fill_viridis_c(name = "Average Taste", option = "C", direction = 1) +  # Color scale for average taste
+  labs(
+    title = "Heatmaps of Average Taste Ratings by Treatment Levels",
+    x = "Liquid Treatment",
+    y = "Hole Treatment"
+  ) +
+  facet_wrap(~ Taster, ncol = 2) +  # Facet for each taster and the overall average
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 0, hjust = 1),  # Rotate x-axis labels for clarity
+    plot.title = element_text(hjust = 0.5)  # Center the plot title
+  )
+
+# Plot the heatmap for color ratings by treatment
+ggplot(avg_by_treatment, aes(x = liquid_treatment, y = hole_treatment, fill = avg_color)) +
+  geom_tile(color = "white") +  # Create the heatmap tiles
+  scale_fill_viridis_c(name = "Average Color", option = "C", direction = -1) +  # Color scale for average color
+  labs(
+    title = "Heatmaps of Average Color Ratings by Treatment Levels",
+    x = "Liquid Treatment",
+    y = "Hole Treatment"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 0, hjust = 1),  # Rotate x-axis labels for clarity
+    plot.title = element_text(hjust = 0.5)  # Center the plot title
+  )
+
+# Bar plot for average taste ratings by hole treatment (treatment vs control)
+ggplot(avg_long_df, aes(x = hole_treatment, y = Taste, fill = hole_treatment)) +
+  geom_bar(stat = "identity", position = "dodge") +  # Bar chart
+  scale_fill_manual(values = c("NH" = "blue", "H" = "red"), name = "Treatment") +  # Custom colors for control and treatment
+  labs(
+    title = "Average Taste Ratings for Treatment (H) and Control (NH)",
+    x = "Hole Treatment",
+    y = "Average Taste Rating"
+  ) +
+  facet_wrap(~ Taster, ncol = 2) +  # Facet by taster and overall average
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5)  # Center the plot title
+  )
+
+# Bar plot for average color ratings by hole treatment (treatment vs control)
+ggplot(avg_by_treatment, aes(x = hole_treatment, y = avg_color, fill = hole_treatment)) +
+  geom_bar(stat = "identity", position = "dodge") +  # Bar chart
+  scale_fill_manual(values = c("NH" = "blue", "H" = "red"), name = "Treatment") +  # Custom colors for control and treatment
+  labs(
+    title = "Average Color Ratings for Treatment (H) and Control (NH)",
+    x = "Hole Treatment",
+    y = "Average Color Rating"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5)  # Center the plot title
+  )
+
+# Bar plot for average taste ratings by liquid treatment
+ggplot(avg_long_df, aes(x = liquid_treatment, y = Taste, fill = liquid_treatment)) +
+  geom_bar(stat = "identity", position = "dodge") +  # Bar chart
+  scale_fill_manual(values = c("NL" = "green", "DC" = "purple", "M" = "orange"), name = "Liquid Treatment") +  # Custom colors for liquid treatment
+  labs(
+    title = "Average Taste Ratings for Liquid Treatments",
+    x = "Liquid Treatment",
+    y = "Average Taste Rating"
+  ) +
+  facet_wrap(~ Taster, ncol = 2) +  # Facet by taster and overall average
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5)  # Center the plot title
+  )
+
+# Bar plot for average color ratings by liquid treatment
+ggplot(avg_by_treatment, aes(x = liquid_treatment, y = avg_color, fill = liquid_treatment)) +
+  geom_bar(stat = "identity", position = "dodge") +  # Bar chart
+  scale_fill_manual(values = c("NL" = "green", "DC" = "purple", "M" = "orange"), name = "Liquid Treatment") +  # Custom colors for liquid treatment
+  labs(
+    title = "Average Color Ratings for Liquid Treatments",
+    x = "Liquid Treatment",
+    y = "Average Color Rating"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5)  # Center the plot title
+  )
+```
+
