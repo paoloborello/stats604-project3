@@ -47,4 +47,13 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# DS_Store
 *.DS_Store
+
+# compiled files
+*.html
+*.pdf
+
+# output folder
+output/

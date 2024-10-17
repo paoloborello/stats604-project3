@@ -2,7 +2,7 @@
 title: "01_EDA"
 author: "Julian Bernado, Paolo Borello, Feifan Jiang, Judy Wu"
 date: "2024-10-17"
-output: pdf_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
