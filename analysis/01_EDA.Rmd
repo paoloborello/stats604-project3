@@ -55,6 +55,21 @@ library(tidyverse)
 banana_data <- read.csv("../data/banana_data.csv")
 ```
 
+
+```{r}
+load("../data/treatment.rda")
+
+# Visualize as a matrix with text labels
+ggplot(treatment_data, aes(x = column, y = row, fill = treatment)) +
+  geom_tile(color = "black") +
+  geom_text(aes(label = treatment), size = 3, color = "black") +  # Add treatment text
+  scale_fill_brewer(palette = "Set3") +
+  labs(x = "Position within Shelf (Column)", y = "Shelf (Row)", title = "Randomized Treatment Assignment with Labels") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  scale_y_reverse()
+```
+
 ```{r}
 # Create the heatmap using ggplot2
 ggplot(banana_data, aes(x = factor(column), y = factor(row), fill = factor(color))) +
