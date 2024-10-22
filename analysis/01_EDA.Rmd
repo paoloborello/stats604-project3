@@ -57,7 +57,7 @@ banana_data <- read.csv("../data/banana_data.csv")
 
 
 ```{r}
-load("../data/treatment.rda")
+treatment_data <- read_csv("../data/treatment.csv", show_col_types = FALSE)
 
 # Visualize as a matrix with text labels
 ggplot(treatment_data, aes(x = column, y = row, fill = treatment)) +
@@ -66,7 +66,6 @@ ggplot(treatment_data, aes(x = column, y = row, fill = treatment)) +
   scale_fill_brewer(palette = "Set3") +
   labs(x = "Position within Shelf (Column)", y = "Shelf (Row)", title = "Randomized Treatment Assignment with Labels") +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
   scale_y_reverse()
 ```
 
@@ -76,7 +75,7 @@ ggplot(banana_data, aes(x = factor(column), y = factor(row), fill = factor(color
   geom_tile(color = "white") +  # Create the heatmap tiles
   scale_fill_viridis_d(name = "Color Scale", option = "C", direction = -1) +  # Use a nice color scale (viridis)
   labs(
-    title = "Heatmap of Banana Ripeness (Color Scale) Over Row and Column",
+    title = "Heatmap of Banana color Over Row and Column",
     x = "Column (Position on Shelf)",
     y = "Row (Shelf Number)"
   ) +
@@ -94,7 +93,6 @@ banana_data <- banana_data %>%
 
 # Reshape the data to long format to facilitate faceting with ggplot2
 taste_long_df <- banana_data %>%
-  select(ID, row, column, taste_1, taste_2, taste_3, taste_avg) %>%
   pivot_longer(cols = starts_with("taste"), 
                names_to = "Taster", 
                values_to = "Taste")
@@ -121,6 +119,75 @@ ggplot(taste_long_df, aes(x = factor(column), y = factor(row), fill = Taste)) +
     axis.text.x = element_text(angle = 0, hjust = 1),  # Rotate x-axis labels for clarity
     plot.title = element_text(hjust = 0.5)  # Center the plot title
   )
+```
+```{r}
+# Plot the distribution of taste by hole treatment and facet wrap by taster
+taste_long_df |>
+  filter(Taster != 'Average Taste')|>
+  ggplot(aes(x = Taste, fill = hole_treatment)) +
+  geom_bar(alpha = 0.85, color = 'black') +  # Density plot with transparency
+  facet_wrap(~ Taster, ncol = 3) +  # Facet by taster
+  labs(title = "Taste Distribution by Hole Treatment", 
+       x = "Taste Rating", y = "Count") +
+  theme_minimal() +
+  scale_fill_manual(values = c("NH" = "blue", "H" = "red"), name = "Hole Treatment") +  # Custom colors for hole treatment
+  theme(plot.title = element_text(hjust = 0.5))  # Center the plot title
+
+# Plot the distribution of taste by hole treatment and facet wrap by taster
+taste_long_df |>
+  filter(Taster == 'Average Taste')|>
+  ggplot(aes(x = Taste, fill = hole_treatment)) +
+  geom_density(alpha = 0.6) +  # Density plot with transparency
+  facet_wrap(~ Taster, ncol = 2) +  # Facet by taster
+  labs(title = "Taste Distribution by Hole Treatment", 
+       x = "Taste Rating", y = "Density") +
+  theme_minimal() +
+  scale_fill_manual(values = c("NH" = "blue", "H" = "red"), name = "Hole Treatment") +  # Custom colors for hole treatment
+  theme(plot.title = element_text(hjust = 0.5))  # Center the plot title
+```
+```{r}
+# Plot the distribution of taste by liquid treatment and facet wrap by taster (excluding 'Average Taste')
+taste_long_df |>
+  filter(Taster != 'Average Taste') |>
+  ggplot(aes(x = Taste, fill = liquid_treatment)) +
+  geom_bar(alpha = 0.85, color='black') +  # Bar plot with dodge position
+  facet_wrap(~ Taster, ncol = 3) +  # Facet by taster
+  labs(title = "Taste Distribution by Liquid Treatment", 
+       x = "Taste Rating", y = "Count") +  # Adjust y-axis to "Count" since it's a bar plot
+  theme_minimal() +
+  scale_fill_manual(values = c("NL" = "skyblue", "DC" = "red", "M" = "white"), name = "Liquid Treatment") +  # Custom colors for liquid treatment
+  theme(plot.title = element_text(hjust = 0.5))  # Center the plot title
+
+# Plot the distribution of taste by liquid treatment (for 'Average Taste')
+taste_long_df |>
+  filter(Taster == 'Average Taste') |>
+  ggplot(aes(x = Taste, fill = liquid_treatment)) +
+  geom_density(alpha = 0.6) +  # Density plot with transparency
+  facet_wrap(~ Taster, ncol = 2) +  # Facet by taster
+  labs(title = "Average Taste Distribution by Liquid Treatment", 
+       x = "Taste Rating", y = "Density") +
+  theme_minimal() +
+  scale_fill_manual(values = c("NL" = "skyblue", "DC" = "red", "M" = "white"), name = "Liquid Treatment") +  # Custom colors for liquid treatment
+  theme(plot.title = element_text(hjust = 0.5))  # Center the plot title
+```
+```{r}
+banana_data |>
+  ggplot(aes(x = color, fill = hole_treatment)) +
+  geom_bar(alpha = 0.85, color = 'black') +  # Density plot with transparency
+  labs(title = "Color Distribution by Hole Treatment", 
+       x = "Color", y = "Count") +
+  theme_minimal() +
+  scale_fill_manual(values = c("NH" = "blue", "H" = "red"), name = "Hole Treatment") +  # Custom colors for hole treatment
+  theme(plot.title = element_text(hjust = 0.5))  # Center the plot title
+
+banana_data |>
+  ggplot(aes(x = color, fill = liquid_treatment)) +
+  geom_bar(alpha = 0.85, color = 'black') +  # Density plot with transparency
+  labs(title = "Color Distribution by Liquid Treatment", 
+       x = "Color", y = "Count") +
+  theme_minimal() +
+  scale_fill_manual(values = c("NL" = "skyblue", "DC" = "red", "M" = "white"), name = "Liquid Treatment") +  # Custom colors for liquid treatment
+  theme(plot.title = element_text(hjust = 0.5))  # Center the plot title
 ```
 
 ```{r}
@@ -181,7 +248,9 @@ ggplot(avg_by_treatment, aes(x = liquid_treatment, y = hole_treatment, fill = av
     axis.text.x = element_text(angle = 0, hjust = 1),  # Rotate x-axis labels for clarity
     plot.title = element_text(hjust = 0.5)  # Center the plot title
   )
+```
 
+```{r}
 # Bar plot for average taste ratings by hole treatment (treatment vs control)
 ggplot(avg_long_df, aes(x = hole_treatment, y = Taste, fill = hole_treatment)) +
   geom_bar(stat = "identity", position = "dodge") +  # Bar chart
@@ -240,4 +309,5 @@ ggplot(avg_by_treatment, aes(x = liquid_treatment, y = avg_color, fill = liquid_
     plot.title = element_text(hjust = 0.5)  # Center the plot title
   )
 ```
+
 

@@ -53,5 +53,5 @@ ggplot(treatment_data, aes(x = column, y = row, fill = treatment)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
   scale_y_reverse()
 
-# Save the dataframe to a file called "treatment.rda"
-save(treatment_data, file = "./data/treatment.rda")
+# Save the data to a file called "csv"
+write.csv(treatment_data, file = "./data/treatment.csv", row.names = FALSE)
