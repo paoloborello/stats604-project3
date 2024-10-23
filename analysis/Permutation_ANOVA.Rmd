@@ -4,7 +4,8 @@ author: "Feifan&Judy"
 date: "2024-10-21"
 output: html_document
 ---
-```{r}  
+```{r}
+library(dplyr)
 #load("/Users/xxxxoxygene/Downloads/treatment.rda")
 banana = read.csv("../data/banana_data.csv")
 ```
@@ -59,7 +60,7 @@ permutation_test_hole_blocked <- function(data, feature, n_permutations = 1000) 
   }
   
   # Calculate p-value
-  p_value <- mean(permuted_diff >= observed_difference)
+  p_value <- mean(abs(permuted_diff) >= abs(observed_difference))
   
   return(list(observed = observed_difference, p_val = p_value))
 }
@@ -70,7 +71,29 @@ permutation_test_hole_blocked(banana, "average_taste")$p_val
 ```
 
 ```{r invert_test}
+invert_hole_test <- function(data, feature, grid, alpha = 0.05){
+  accepted <- logical(length = length(grid))
+  for(i in 1:length(grid)){
+    modified_data <- data %>% mutate({{feature}} := if_else(hole_treatment == "H", !!sym(feature) - grid[i], !!sym(feature)))
+    accepted[i] <- permutation_test_hole_blocked(modified_data, feature)$p_val >= 0.05
+  }
+  return(grid[accepted])
+}
+color_test <- permutation_test_hole_blocked(banana, "color")
+observed_val <- color_test$observed
+color_grid <- seq(from = observed_val - 0.1, to = observed_val + 0.1, length.out = 100)
+color_ci <- invert_hole_test(banana, "color", color_grid)
+print(min(color_ci))
+print(max(color_ci))
+```
 
+```{r}
+taste_test <- permutation_test_hole_blocked(banana, "average_taste")
+observed_val <- taste_test$observed
+taste_grid <- seq(from = -observed_val, to = 2*observed_val, length.out = 50)
+taste_ci <- invert_hole_test(banana, "average_taste", grid)
+print(min(taste_ci))
+print(max(taste_ci))
 ```
 
 ## Permutation test: Liquid
@@ -97,7 +120,6 @@ perm_test_diet_coke <- function(data, feature, n_perm = 1000) {
 
 perm_test_diet_coke(banana, "color")$p_value
 perm_test_diet_coke(banana, "average_taste")$p_value
-
 ```
 
 ```{r perm_test_diet_coke_blocked}
@@ -133,8 +155,34 @@ perm_test_diet_coke_blocked(banana, "color")$p_value
 perm_test_diet_coke_blocked(banana, "average_taste")$p_value
 ```
 
-```{r invert_test}
+```{r invert_test_dc}
+invert_liquid_test <- function(data, feature, grid, condition, alpha = 0.05){
+  accepted <- logical(length = length(grid))
+  for(i in 1:length(grid)){
+    modified_data <- data %>% mutate({{feature}} := if_else(liquid_treatment == condition, !!sym(feature) - grid[i], !!sym(feature)))
+    if(condition == "DC"){
+      accepted[i] <- perm_test_diet_coke_blocked(modified_data, feature)$p_value >= 0.05
+    } else{
+      accepted[i] <- perm_test_milk_blocked(modified_data, feature)$p_value >= 0.05
+    }
+  }
+  return(grid[accepted])
+}
+color_test <- perm_test_diet_coke_blocked(banana, "color")
+observed_val <- color_test$observed_stat
+color_grid <- seq(from = -observed_val, to = 2*observed_val, length.out = 50)
+color_ci <- invert_liquid_test(banana, "color", color_grid, "DC")
+print(min(color_ci))
+print(max(color_ci))
+```
 
+```{r invert_dc_taste}
+taste_test <- perm_test_diet_coke_blocked(banana, "average_taste")
+observed_val <- taste_test$observed_stat
+taste_grid <- seq(from = -5*observed_val, to = 5*observed_val, length.out = 100)
+taste_ci <- invert_liquid_test(banana, "average_taste", taste_grid, "DC")
+print(min(taste_ci))
+print(max(taste_ci))
 ```
 
 
@@ -197,8 +245,22 @@ perm_test_milk_blocked(banana, "color")$p_value
 perm_test_milk_blocked(banana, "average_taste")$p_value
 ```
 
-```{r invert_test}
+```{r invert_milk}
+color_test <- perm_test_milk_blocked(banana, "color")
+observed_val <- color_test$obs_stat
+color_grid <- seq(from = -5*observed_val, to = 5*observed_val, length.out = 25)
+color_ci <- invert_liquid_test(banana, "color", color_grid, "M")
+print(min(color_ci))
+print(max(color_ci))
+```
 
+```{r invert_milk_taste}
+taste_test <- perm_test_milk_blocked(banana, "average_taste")
+observed_val <- taste_test$obs_stat
+taste_grid <- seq(from = -5*observed_val, to = 5*observed_val, length.out = 100)
+taste_ci <- invert_liquid_test(banana, "average_taste", taste_grid, "M")
+print(min(taste_ci))
+print(max(taste_ci))
 ```
 
 ## ANOVA permutation for liquid
