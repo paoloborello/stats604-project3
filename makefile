@@ -12,6 +12,9 @@ PLOTS_DIR := images/plots
 # Default rule: Create output directory, plots directory, and render Rmd files to HTML
 all: $(OUTPUT_DIR) $(PLOTS_DIR) $(RMD_FILES:analysis/%.Rmd=$(OUTPUT_DIR)/%.html)
 
+# EDA rule: Create directories and render only 01_EDA.Rmd
+eda: $(OUTPUT_DIR) $(PLOTS_DIR) $(OUTPUT_DIR)/01_EDA.html
+
 # Rule to create the output directory if it does not exist
 $(OUTPUT_DIR):
 	@echo "Creating output directory..."
@@ -33,6 +36,6 @@ clean:
 	rm -rf $(OUTPUT_DIR)/*.html
 	rm -rf $(PLOTS_DIR)/*.png
 	@echo "Cleaning folders..."
-	@rmdir $(PLOTS_DIR) || true
-	@rmdir $(OUTPUT_DIR) || true
+	rmdir $(PLOTS_DIR)
+	rmdir $(OUTPUT_DIR)
 	
