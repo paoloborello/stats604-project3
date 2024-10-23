@@ -5,8 +5,8 @@ date: "2024-10-21"
 output: html_document
 ---
 ```{r}  
-load("/Users/xxxxoxygene/Downloads/treatment.rda")
-banana = read.csv("/Users/xxxxoxygene/Downloads/banana_data.csv")
+#load("/Users/xxxxoxygene/Downloads/treatment.rda")
+banana = read.csv("../data/banana_data.csv")
 ```
 
 ```{r}
@@ -37,6 +37,10 @@ permutation_test_hole(banana, "average_taste")$p_val
 
 ```
 
+```{r invert_test}
+
+```
+
 ## Permutation test: Liquid
 
 ```{r}
@@ -59,6 +63,10 @@ perm_test_diet_coke <- function(data, feature, n_perm = 1000) {
 
 perm_test_diet_coke(banana, "color")$p_value
 perm_test_diet_coke(banana, "average_taste")$p_value
+
+```
+
+```{r invert_test}
 
 ```
 
@@ -86,6 +94,10 @@ perm_test_milk(banana, "average_taste")$p_value
 
 ```
 
+```{r invert_test}
+
+```
+
 ## ANOVA permutation for liquid
 
 ```{r}
@@ -103,7 +115,6 @@ perm_anova_color_test <- function(df, n_perm = 1000) {
 }
 
 perm_anova_color_test(banana)$p_value
-
 ```
 
 ```{r}

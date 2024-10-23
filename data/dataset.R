@@ -2,17 +2,12 @@
 library(dplyr)
 
 # Read in the data
-tasting_order <- read.csv("./data/tasting_order_01.csv")
+collected_data <- read.csv("./data/collected_data.csv")
 treatment <- read.csv("./data/treatment.csv")
 
 # Create a column for ID (row number) in both datasets for future reference
-tasting_order <- tasting_order %>%
+collected_data <- collected_data %>%
   mutate(ID = row_number())
-
-# Sample color uniformly between [0, 1]
-set.seed(123)  # Set seed for reproducibility
-tasting_order <- tasting_order %>%
-  mutate(color = runif(n()))
 
 # Define the custom treatment index mapping
 #   | **Treatment Index** | **Hole Treatment** | **Liquid Treatment** |
@@ -30,10 +25,10 @@ treatment_mapping <- data.frame(
 )
 
 # Join the treatment and tasting_order data by row and column
-joined_data <- tasting_order %>%
-  inner_join(treatment, by = c("row", "col" = "column")) %>%
+joined_data <- collected_data %>%
+  inner_join(treatment, by = c("row", "column")) %>%
   left_join(treatment_mapping, by = c("hole_treatment", "liquid_treatment")) %>%
-  rename(column = col, taste_1 = Julian, taste_2 = Paolo, taste_3 = Feifan) %>%
+  rename(taste_1 = Julian, taste_2 = Paolo, taste_3 = Feifan) %>%
   select(ID, row, column, treatment_idx, hole_treatment, liquid_treatment, color, taste_1, taste_2, taste_3)
 
 # Save the final joined dataset to a CSV file
