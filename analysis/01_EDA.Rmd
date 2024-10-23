@@ -70,12 +70,12 @@ ggplot(treatment_data, aes(x = column, y = row, fill = treatment)) +
 ```
 
 ```{r}
-# Create the heatmap using ggplot2
-ggplot(banana_data, aes(x = factor(column), y = factor(row), fill = factor(color))) +
+# Create the heatmap using ggplot2 with a custom color gradient (green to brown)
+ggplot(banana_data, aes(x = factor(column), y = factor(row), fill = color)) +
   geom_tile(color = "white") +  # Create the heatmap tiles
-  scale_fill_viridis_d(name = "Color Scale", option = "C", direction = -1) +  # Use a nice color scale (viridis)
+  scale_fill_gradient(name = "Color Scale", low = "green", high = "brown") +  # Custom gradient from green to brown
   labs(
-    title = "Heatmap of Banana color Over Row and Column",
+    title = "Heatmap of Banana Color Over Row and Column",
     x = "Column (Position on Shelf)",
     y = "Row (Shelf Number)"
   ) +
@@ -107,7 +107,7 @@ taste_long_df$Taster <- recode(taste_long_df$Taster,
 # Plot the faceted heatmaps using ggplot2
 ggplot(taste_long_df, aes(x = factor(column), y = factor(row), fill = Taste)) +
   geom_tile(color = "white") +  # Create the heatmap tiles
-  scale_fill_viridis_c(name = "Taste Rating", option = "C", direction = 1) +  # Color scale
+  scale_fill_gradient(name = "Taste Scale", low = "green", high = "brown") +
   labs(
     title = "Heatmaps of Taste Ratings by Row and Column",
     x = "Column (Position on Shelf)",
@@ -171,20 +171,22 @@ taste_long_df |>
   theme(plot.title = element_text(hjust = 0.5))  # Center the plot title
 ```
 ```{r}
+# Color Distribution by Hole Treatment (Density Plot)
 banana_data |>
   ggplot(aes(x = color, fill = hole_treatment)) +
-  geom_bar(alpha = 0.85, color = 'black') +  # Density plot with transparency
+  geom_density(alpha = 0.85, color = 'black') +  # Density plot for continuous color
   labs(title = "Color Distribution by Hole Treatment", 
-       x = "Color", y = "Count") +
+       x = "Color (0 to 1)", y = "Density") +
   theme_minimal() +
   scale_fill_manual(values = c("NH" = "blue", "H" = "red"), name = "Hole Treatment") +  # Custom colors for hole treatment
   theme(plot.title = element_text(hjust = 0.5))  # Center the plot title
 
+# Color Distribution by Liquid Treatment (Density Plot)
 banana_data |>
   ggplot(aes(x = color, fill = liquid_treatment)) +
-  geom_bar(alpha = 0.85, color = 'black') +  # Density plot with transparency
+  geom_density(alpha = 0.85, color = 'black') +  # Density plot for continuous color
   labs(title = "Color Distribution by Liquid Treatment", 
-       x = "Color", y = "Count") +
+       x = "Color (0 to 1)", y = "Density") +
   theme_minimal() +
   scale_fill_manual(values = c("NL" = "skyblue", "DC" = "red", "M" = "white"), name = "Liquid Treatment") +  # Custom colors for liquid treatment
   theme(plot.title = element_text(hjust = 0.5))  # Center the plot title
@@ -221,7 +223,7 @@ avg_long_df$Taster <- recode(avg_long_df$Taster,
 # Plot the faceted heatmaps for each taster's average taste rating and overall average by treatment
 ggplot(avg_long_df, aes(x = liquid_treatment, y = hole_treatment, fill = Taste)) +
   geom_tile(color = "white") +  # Create the heatmap tiles
-  scale_fill_viridis_c(name = "Average Taste", option = "C", direction = 1) +  # Color scale for average taste
+  scale_fill_gradient(name = "Color Scale", low = "green", high = "brown") +  # Custom gradient from green to brown
   labs(
     title = "Heatmaps of Average Taste Ratings by Treatment Levels",
     x = "Liquid Treatment",
@@ -237,7 +239,7 @@ ggplot(avg_long_df, aes(x = liquid_treatment, y = hole_treatment, fill = Taste))
 # Plot the heatmap for color ratings by treatment
 ggplot(avg_by_treatment, aes(x = liquid_treatment, y = hole_treatment, fill = avg_color)) +
   geom_tile(color = "white") +  # Create the heatmap tiles
-  scale_fill_viridis_c(name = "Average Color", option = "C", direction = -1) +  # Color scale for average color
+  scale_fill_gradient(name = "Color Scale", low = "green", high = "brown") +  # Custom gradient from green to brown
   labs(
     title = "Heatmaps of Average Color Ratings by Treatment Levels",
     x = "Liquid Treatment",
@@ -251,25 +253,31 @@ ggplot(avg_by_treatment, aes(x = liquid_treatment, y = hole_treatment, fill = av
 ```
 
 ```{r}
-# Bar plot for average taste ratings by hole treatment (treatment vs control)
-ggplot(avg_long_df, aes(x = hole_treatment, y = Taste, fill = hole_treatment)) +
-  geom_bar(stat = "identity", position = "dodge") +  # Bar chart
-  scale_fill_manual(values = c("NH" = "blue", "H" = "red"), name = "Treatment") +  # Custom colors for control and treatment
+avg_long_df |> 
+  group_by(hole_treatment, Taster) |> 
+  summarise(Average_Taste = mean(Taste, na.rm = TRUE), .groups = 'drop') |> 
+  ggplot(aes(x = hole_treatment, y = Average_Taste, fill = hole_treatment)) +
+  geom_col(position = "dodge", color = 'black') +  # Use geom_col for precomputed averages
+  scale_fill_manual(values = c("NH" = "blue", "H" = "red"), name = "Hole Treatment") +  # Custom colors for control and treatment
   labs(
-    title = "Average Taste Ratings for Treatment (H) and Control (NH)",
+    title = "Average Taste Ratings by Hole Treatment (H) and Control (NH)",
     x = "Hole Treatment",
     y = "Average Taste Rating"
   ) +
-  facet_wrap(~ Taster, ncol = 2) +  # Facet by taster and overall average
+  facet_wrap(~ Taster, ncol = 2) +  # Facet by taster
   theme_minimal() +
   theme(
     plot.title = element_text(hjust = 0.5)  # Center the plot title
   )
 
 # Bar plot for average color ratings by hole treatment (treatment vs control)
-ggplot(avg_by_treatment, aes(x = hole_treatment, y = avg_color, fill = hole_treatment)) +
-  geom_bar(stat = "identity", position = "dodge") +  # Bar chart
-  scale_fill_manual(values = c("NH" = "blue", "H" = "red"), name = "Treatment") +  # Custom colors for control and treatment
+avg_by_treatment |> 
+  group_by(hole_treatment) |> 
+  summarise(avg_color = mean(avg_color, na.rm = TRUE)) |> 
+  ungroup() |>
+  ggplot(aes(x = hole_treatment, y = avg_color, fill = hole_treatment)) +
+  geom_col(position = "dodge", color = 'black') +  # Use geom_col for precomputed averages
+  scale_fill_manual(values = c("NH" = "blue", "H" = "red"), name = "Hole Treatment") +  # Custom colors for control and treatment
   labs(
     title = "Average Color Ratings for Treatment (H) and Control (NH)",
     x = "Hole Treatment",
@@ -279,11 +287,16 @@ ggplot(avg_by_treatment, aes(x = hole_treatment, y = avg_color, fill = hole_trea
   theme(
     plot.title = element_text(hjust = 0.5)  # Center the plot title
   )
+```
 
+```{r}
 # Bar plot for average taste ratings by liquid treatment
-ggplot(avg_long_df, aes(x = liquid_treatment, y = Taste, fill = liquid_treatment)) +
-  geom_bar(stat = "identity", position = "dodge") +  # Bar chart
-  scale_fill_manual(values = c("NL" = "green", "DC" = "purple", "M" = "orange"), name = "Liquid Treatment") +  # Custom colors for liquid treatment
+avg_long_df |> 
+  group_by(liquid_treatment, Taster) |> 
+  summarise(Average_Taste = mean(Taste, na.rm = TRUE), .groups = 'drop') |> 
+  ggplot(aes(x = liquid_treatment, y = Average_Taste, fill = liquid_treatment)) +
+  geom_col(position = "dodge", color = 'black') +  # Use geom_col for precomputed averages
+  scale_fill_manual(values = c("NL" = "skyblue", "DC" = "red", "M" = "white"), name = "Liquid Treatment") +  # Custom colors for liquid treatment
   labs(
     title = "Average Taste Ratings for Liquid Treatments",
     x = "Liquid Treatment",
@@ -296,9 +309,12 @@ ggplot(avg_long_df, aes(x = liquid_treatment, y = Taste, fill = liquid_treatment
   )
 
 # Bar plot for average color ratings by liquid treatment
-ggplot(avg_by_treatment, aes(x = liquid_treatment, y = avg_color, fill = liquid_treatment)) +
-  geom_bar(stat = "identity", position = "dodge") +  # Bar chart
-  scale_fill_manual(values = c("NL" = "green", "DC" = "purple", "M" = "orange"), name = "Liquid Treatment") +  # Custom colors for liquid treatment
+avg_by_treatment |> 
+  group_by(liquid_treatment) |> 
+  summarise(avg_color = mean(avg_color, na.rm = TRUE)) |> 
+  ggplot(aes(x = liquid_treatment, y = avg_color, fill = liquid_treatment)) +
+  geom_col(position = "dodge", color = 'black') +  # Use geom_col for precomputed averages
+  scale_fill_manual(values = c("NL" = "skyblue", "DC" = "red", "M" = "white"), name = "Liquid Treatment") +  # Custom colors for liquid treatment
   labs(
     title = "Average Color Ratings for Liquid Treatments",
     x = "Liquid Treatment",
@@ -309,5 +325,4 @@ ggplot(avg_by_treatment, aes(x = liquid_treatment, y = avg_color, fill = liquid_
     plot.title = element_text(hjust = 0.5)  # Center the plot title
   )
 ```
-
 

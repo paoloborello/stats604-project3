@@ -10,6 +10,7 @@ banana = read.csv("../data/banana_data.csv")
 ```
 
 ```{r}
+set.seed(123)
 banana$average_taste <- apply(banana[, c('taste_1', 'taste_2', 'taste_3')], 1, mean)
 ```
 
@@ -34,7 +35,38 @@ permutation_test_hole <- function(data, feature, n_permutations = 1000) {
 }
 permutation_test_hole(banana, "color")$p_val
 permutation_test_hole(banana, "average_taste")$p_val
+```
 
+```{r permutation_test_hole_blocked}
+permutation_test_hole_blocked <- function(data, feature, n_permutations = 1000) {
+  # Calculate the observed difference in means
+  observed_difference <- with(data, mean(get(feature)[hole_treatment == "H"]) - 
+                                     mean(get(feature)[hole_treatment == "NH"]))
+  
+  permuted_diff <- numeric(n_permutations)
+  
+  # Permutation process within row blocks
+  for (perm in seq_len(n_permutations)) {
+    # Shuffle treatment only within each row (block)
+    shuffled_treatment <- data %>%
+      group_by(row) %>%
+      mutate(shuffled_treatment = sample(hole_treatment)) %>%
+      pull(shuffled_treatment)
+    
+    # Calculate permuted difference based on the shuffled treatment
+    permuted_diff[perm] <- with(data, mean(get(feature)[shuffled_treatment == "H"]) - 
+                                       mean(get(feature)[shuffled_treatment == "NH"]))
+  }
+  
+  # Calculate p-value
+  p_value <- mean(permuted_diff >= observed_difference)
+  
+  return(list(observed = observed_difference, p_val = p_value))
+}
+
+# Example usage
+permutation_test_hole_blocked(banana, "color")$p_val
+permutation_test_hole_blocked(banana, "average_taste")$p_val
 ```
 
 ```{r invert_test}
@@ -42,6 +74,8 @@ permutation_test_hole(banana, "average_taste")$p_val
 ```
 
 ## Permutation test: Liquid
+
+### Diet Coke vs No Liquid
 
 ```{r}
 perm_test_diet_coke <- function(data, feature, n_perm = 1000) {
@@ -66,11 +100,47 @@ perm_test_diet_coke(banana, "average_taste")$p_value
 
 ```
 
+```{r perm_test_diet_coke_blocked}
+perm_test_diet_coke_blocked <- function(data, feature, n_perm = 1000) {
+  # Subset the data to only include rows with DC and NL liquid treatments
+  subset_data <- subset(data, liquid_treatment %in% c("DC", "NL"))
+  
+  # Calculate the observed statistic
+  observed_stat <- mean(subset_data[[feature]][subset_data$liquid_treatment == "DC"]) -
+                   mean(subset_data[[feature]][subset_data$liquid_treatment == "NL"])
+  
+  # Permutation process within row blocks
+  perm_diff <- replicate(n_perm, {
+    # Shuffle liquid treatment only within each row (block)
+    shuffled_liquid <- subset_data %>%
+      group_by(row) %>%
+      mutate(shuffled_liquid = sample(liquid_treatment)) %>%
+      pull(shuffled_liquid)
+    
+    # Calculate the permuted difference
+    mean(subset_data[[feature]][shuffled_liquid == "DC"]) - 
+    mean(subset_data[[feature]][shuffled_liquid == "NL"])
+  })
+  
+  # Calculate p-value
+  p_val <- mean(perm_diff >= observed_stat)
+  
+  return(list(observed_stat = observed_stat, p_value = p_val))
+}
+
+# Example usage
+perm_test_diet_coke_blocked(banana, "color")$p_value
+perm_test_diet_coke_blocked(banana, "average_taste")$p_value
+```
+
 ```{r invert_test}
 
 ```
 
-```{r}
+
+### Milk vs No Liquid
+
+```{r perm_test_milk}
 perm_test_milk <- function(df, feature, n_perm = 1000) {
   df_subset <- df[df$liquid_treatment %in% c("M", "NL"), ]
   
@@ -91,7 +161,40 @@ perm_test_milk <- function(df, feature, n_perm = 1000) {
 
 perm_test_milk(banana, "color")$p_value
 perm_test_milk(banana, "average_taste")$p_value
+```
 
+```{r perm_test_milk_blocked}
+perm_test_milk_blocked <- function(df, feature, n_perm = 1000) {
+  # Subset the data to only include rows with M and NL liquid treatments
+  df_subset <- df[df$liquid_treatment %in% c("M", "NL"), ]
+  
+  # Calculate the observed statistic
+  obs_stat <- mean(df_subset[[feature]][df_subset$liquid_treatment == "M"]) - 
+              mean(df_subset[[feature]][df_subset$liquid_treatment == "NL"])
+  
+  # Permutation process within row blocks
+  perm_results <- numeric(n_perm)
+  for (i in 1:n_perm) {
+    # Shuffle liquid treatment only within each row (block)
+    perm_liquid <- df_subset %>%
+      group_by(row) %>%
+      mutate(shuffled_liquid = sample(liquid_treatment)) %>%
+      pull(shuffled_liquid)
+    
+    # Calculate the permuted difference
+    perm_results[i] <- mean(df_subset[[feature]][perm_liquid == "M"]) - 
+                       mean(df_subset[[feature]][perm_liquid == "NL"])
+  }
+  
+  # Calculate p-value
+  p_val <- mean(perm_results >= obs_stat)
+  
+  return(list(obs_stat = obs_stat, p_value = p_val))
+}
+
+# Example usage
+perm_test_milk_blocked(banana, "color")$p_value
+perm_test_milk_blocked(banana, "average_taste")$p_value
 ```
 
 ```{r invert_test}
@@ -100,7 +203,9 @@ perm_test_milk(banana, "average_taste")$p_value
 
 ## ANOVA permutation for liquid
 
-```{r}
+### Univariate Treatments
+
+```{r perm_anova_color_test}
 perm_anova_color_test <- function(df, n_perm = 1000) {
   obs_stat <- summary(aov(color ~ liquid_treatment, data = df))[[1]]["F value"][1, ]
   
@@ -117,7 +222,34 @@ perm_anova_color_test <- function(df, n_perm = 1000) {
 perm_anova_color_test(banana)$p_value
 ```
 
-```{r}
+```{r perm_anova_color_test_blocked}
+perm_anova_color_test_blocked <- function(df, n_perm = 1000) {
+  # Compute the observed F-statistic
+  obs_stat <- summary(aov(color ~ liquid_treatment, data = df))[[1]]["F value"][1, ]
+  
+  # Permutation process within row blocks
+  perm_f_stats <- replicate(n_perm, {
+    # Shuffle liquid treatment only within each row block
+    df$liquid_treatment <- df %>%
+      group_by(row) %>%
+      mutate(shuffled_liquid_treatment = sample(liquid_treatment)) %>%
+      pull(shuffled_liquid_treatment)
+    
+    # Compute the F-statistic for the permuted data
+    summary(aov(color ~ liquid_treatment, data = df))[[1]]["F value"][1, ]
+  })
+  
+  # Calculate p-value
+  p_val <- mean(perm_f_stats >= obs_stat)
+  
+  return(list(observed = obs_stat, p_value = p_val))
+}
+
+# Example usage
+perm_anova_color_test_blocked(banana)$p_value
+```
+
+```{r perm_anova_taste_test}
 perm_anova_taste_test <- function(df, n_perm = 1000) {
   obs_stat <- summary(aov(average_taste ~ liquid_treatment, data = df))[[1]]["F value"][1, ]
   
@@ -133,6 +265,36 @@ perm_anova_taste_test <- function(df, n_perm = 1000) {
 
 perm_anova_taste_test(banana)$p_value
 ```
+
+```{r perm_anova_taste_test_blocked}
+perm_anova_taste_test_blocked <- function(df, n_perm = 1000) {
+  # Compute the observed F-statistic
+  obs_stat <- summary(aov(average_taste ~ liquid_treatment, data = df))[[1]]["F value"][1, ]
+  
+  # Permutation process within row blocks
+  perm_f_stats <- replicate(n_perm, {
+    # Shuffle liquid treatment only within each row block
+    df$liquid_treatment <- df %>%
+      group_by(row) %>%
+      mutate(shuffled_liquid_treatment = sample(liquid_treatment)) %>%
+      pull(shuffled_liquid_treatment)
+    
+    # Compute the F-statistic for the permuted data
+    summary(aov(average_taste ~ liquid_treatment, data = df))[[1]]["F value"][1, ]
+  })
+  
+  # Calculate p-value
+  p_val <- mean(perm_f_stats >= obs_stat)
+  
+  return(list(observed = obs_stat, p_value = p_val))
+}
+
+# Example usage
+perm_anova_taste_test_blocked(banana)$p_value
+```
+
+### Treatment Interactions
+
 ```{r}
 perm_anova_interaction_color <- function(df, n_perm = 1000) {
   observed_stat <- summary(aov(color ~ hole_treatment * liquid_treatment, data = df))[[1]]["F value"][1, ]
