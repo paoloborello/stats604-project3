@@ -1,0 +1,135 @@
+---
+title: "604proj3"
+author: "Judy Wu"
+date: "2024-10-21"
+output: html_document
+---
+```{r}
+treatment = read.csv("/Users/judydw/Documents/GitHub/stats604-project3/data/treatment.csv")
+banana = read.csv("/Users/judydw/Documents/GitHub/stats604-project3/data/banana_data.csv")
+tasting = read.csv("/Users/judydw/Documents/GitHub/stats604-project3/data/tasting_order_01.csv")
+```
+
+```{r}
+tasting = tasting[,2:6]
+colnames(tasting) = c("row", "column","Julian","Paolo" ,"Feifan")
+merged_banana <- merge(banana, tasting, by = c("row", "column"))
+banana <- subset(merged_banana, select = -c(taste_1, taste_2, taste_3))
+head(banana)
+```
+
+```{r}
+banana$avg_taste = rowMeans(banana[,8:10])
+```
+
+## Permutation test: Holes
+
+```{r}
+permutation_test_hole <- function(df, feature, num_permutations = 1000) {
+  observed_stat <- mean(df[df$hole_treatment=="H",feature]) - mean(df[df$hole_treatment=="NH",feature])
+
+  permuted_stats <- numeric(num_permutations)
+  for (i in 1:num_permutations) {
+    shuffled_trt <- sample(df$hole_treatment)
+    permuted_stat <- mean(df[shuffled_trt=="H",feature]) - mean(df[shuffled_trt=="NH",feature])
+    permuted_stats[i] <- permuted_stat
+  }
+
+  p_value <- mean(observed_stat > permuted_stats)
+
+  return(list(observed_stat = observed_stat, permuted_stats = permuted_stats, p_value = p_value))
+}
+permutation_test_hole(banana,"color")$p_value
+permutation_test_hole(banana,"avg_taste")$p_value
+
+```
+
+## Permutation test: Liquid
+
+```{r}
+permutation_test_dc <- function(df, feature, num_permutations = 1000) {
+  sub_df <- df[df$liquid_treatment == "DC"|df$liquid_treatment == "NL",]
+  observed_stat <- mean(df[df$liquid_treatment=="DC",feature]) -mean(df[df$liquid_treatment=="NL",feature])
+
+  permuted_stats <- numeric(num_permutations)
+  for (i in 1:num_permutations) {
+    shuffled_trt <- sample(sub_df$liquid_treatment)
+    permuted_stat <- mean(sub_df[shuffled_trt=="DC",feature]) - mean(sub_df[shuffled_trt=="NL",feature])
+    permuted_stats[i] <- permuted_stat
+  }
+
+  p_value <- mean(observed_stat > permuted_stats)
+
+  return(list(observed_stat = observed_stat, permuted_stats = permuted_stats, p_value = p_value))
+}
+permutation_test_dc(banana,"color")$p_value
+permutation_test_dc(banana,"avg_taste")$p_value
+```
+
+```{r}
+permutation_test_m <- function(df, feature, num_permutations = 1000) {
+  sub_df <- df[df$liquid_treatment == "M"|df$liquid_treatment == "NL",]
+  observed_stat <- mean(df[df$liquid_treatment=="M",feature]) -mean(df[df$liquid_treatment=="NL",feature])
+
+  permuted_stats <- numeric(num_permutations)
+  for (i in 1:num_permutations) {
+    shuffled_trt <- sample(sub_df$liquid_treatment)
+    permuted_stat <- mean(sub_df[shuffled_trt=="M",feature]) - mean(sub_df[shuffled_trt=="NL",feature])
+    permuted_stats[i] <- permuted_stat
+  }
+
+  p_value <- mean(observed_stat > permuted_stats)
+
+  return(list(observed_stat = observed_stat, permuted_stats = permuted_stats, p_value = p_value))
+}
+permutation_test_m(banana,"color")$p_value
+permutation_test_m(banana,"avg_taste")$p_value
+```
+
+## ANOVA permutation for liquid
+
+```{r}
+permutation_test_anova_color <- function(df, num_permutations = 1000) {
+
+  observed_stat <- summary(aov(color ~ liquid_treatment, data = df))[[1]]["F value"][1,]
+
+  permuted_stats <- numeric(num_permutations)
+
+  for (i in 1:num_permutations) {
+    shuffled_trt <- sample(df$liquid_treatment)
+
+    temp_df <- df
+    temp_df$liquid_treatment <- shuffled_trt
+
+    permuted_stat <- summary(aov(color ~ liquid_treatment, data = temp_df))[[1]]["F value"][1,]
+    permuted_stats[i] <- permuted_stat
+  }
+
+  p_value <- mean(permuted_stats >= observed_stat)
+  return(list(observed_stat = observed_stat, permuted_stats = permuted_stats, p_value = p_value))
+}
+permutation_test_anova_color(banana)$p_value
+```
+
+```{r}
+permutation_test_anova_taste <- function(df, num_permutations = 1000) {
+
+  observed_stat <- summary(aov(avg_taste ~ liquid_treatment, data = df))[[1]]["F value"][1,]
+
+  permuted_stats <- numeric(num_permutations)
+
+  for (i in 1:num_permutations) {
+    shuffled_trt <- sample(df$liquid_treatment)
+
+    temp_df <- df
+    temp_df$liquid_treatment <- shuffled_trt
+
+    permuted_stat <- summary(aov(avg_taste ~ liquid_treatment, data = temp_df))[[1]]["F value"][1,]
+    permuted_stats[i] <- permuted_stat
+  }
+
+  p_value <- mean(permuted_stats >= observed_stat)
+  return(list(observed_stat = observed_stat, permuted_stats = permuted_stats, p_value = p_value))
+}
+permutation_test_anova_taste(banana)$p_value
+```
