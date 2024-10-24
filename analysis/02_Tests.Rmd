@@ -91,7 +91,7 @@ print(max(color_ci))
 taste_test <- permutation_test_hole_blocked(banana, "average_taste")
 observed_val <- taste_test$observed
 taste_grid <- seq(from = -observed_val, to = 2*observed_val, length.out = 50)
-taste_ci <- invert_hole_test(banana, "average_taste", grid)
+taste_ci <- invert_hole_test(banana, "average_taste", taste_grid)
 print(min(taste_ci))
 print(max(taste_ci))
 ```

@@ -16,8 +16,9 @@ treatment_data <- read_csv("../data/treatment.csv", show_col_types = FALSE)
 ```
 
 ```{r}
-fig_width = 8
-fig_height = 6
+fig_width = 8*0.75
+fig_height = 6*0.75
+fig_dpi = 400
 ```
 
 
@@ -34,12 +35,12 @@ treatmant_assignment <- ggplot(treatment_data, aes(x = column, y = row, fill = t
 treatmant_assignment
 
 ggsave(filename = "../images/plots/treatmant_assignment.png", 
-       plot = treatmant_assignment, width = fig_width, height = fig_height, dpi = 300)
+       plot = treatmant_assignment, width = fig_width, height = fig_height, dpi = fig_dpi)
 ```
 
 ```{r}
 # Create the heatmap using ggplot2 with a custom color gradient (green to brown)
-color_by_pos <- ggplot(banana_data, aes(x = factor(column), y = factor(row), fill = color)) +
+color_by_pos <- ggplot(banana_data, aes(x = column, y = row, fill = color)) +
   geom_tile(color = "white") +  # Create the heatmap tiles
   scale_fill_gradient(name = "Color Scale", low = "green", high = "brown") +  # Custom gradient from green to brown
   labs(
@@ -51,12 +52,13 @@ color_by_pos <- ggplot(banana_data, aes(x = factor(column), y = factor(row), fil
   theme(
     axis.text.x = element_text(angle = 0, hjust = 1),  # Rotate x-axis labels for clarity
     plot.title = element_text(hjust = 0.5)  # Center the plot title
-  )
+  ) +
+  scale_y_reverse()
 
 color_by_pos
 
 ggsave(filename = "../images/plots/color_by_pos.png", 
-       plot = color_by_pos, width = fig_width, height = fig_height, dpi = 300)
+       plot = color_by_pos, width = fig_width, height = fig_height, dpi = fig_dpi)
 ```
 
 ```{r}
@@ -78,7 +80,7 @@ taste_long_df$Taster <- recode(taste_long_df$Taster,
                                taste_avg = "Average Taste")
 
 # Plot the faceted heatmaps using ggplot2
-taste_by_pos <- ggplot(taste_long_df, aes(x = factor(column), y = factor(row), fill = Taste)) +
+taste_by_pos <- ggplot(taste_long_df, aes(x = column, y = row, fill = Taste)) +
   geom_tile(color = "white") +  # Create the heatmap tiles
   scale_fill_gradient(name = "Taste Scale", low = "green", high = "brown") +
   labs(
@@ -91,13 +93,15 @@ taste_by_pos <- ggplot(taste_long_df, aes(x = factor(column), y = factor(row), f
   theme(
     axis.text.x = element_text(angle = 0, hjust = 1),  # Rotate x-axis labels for clarity
     plot.title = element_text(hjust = 0.5)  # Center the plot title
-  )
+  ) + 
+  scale_y_reverse()
 
 taste_by_pos
 
 ggsave(filename = "../images/plots/taste_by_pos.png", 
-       plot = taste_by_pos, width = fig_width, height = fig_height, dpi = 300)
+       plot = taste_by_pos, width = fig_width, height = fig_height, dpi = fig_dpi)
 ```
+
 ```{r}
 # Plot the distribution of taste by hole treatment and facet wrap by taster
 taste_dist_by_taster_hole <- taste_long_df |>
@@ -126,12 +130,12 @@ avg_taste_dist_hole <- taste_long_df |>
 taste_dist_by_taster_hole
 
 ggsave(filename = "../images/plots/taste_dist_by_taster_hole.png", 
-       plot = taste_dist_by_taster_hole, width = fig_width, height = fig_height, dpi = 300)
+       plot = taste_dist_by_taster_hole, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 avg_taste_dist_hole
 
 ggsave(filename = "../images/plots/avg_taste_dist_hole.png", 
-       plot = avg_taste_dist_hole, width = fig_width, height = fig_height, dpi = 300)
+       plot = avg_taste_dist_hole, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 ```
 ```{r}
@@ -161,12 +165,12 @@ avg_taste_dist_liquid <- taste_long_df |>
 
 taste_dist_by_taster_liquid
 ggsave(filename = "../images/plots/taste_dist_by_taster_liquid.png", 
-       plot = taste_dist_by_taster_liquid, width = fig_width, height = fig_height, dpi = 300)
+       plot = taste_dist_by_taster_liquid, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 avg_taste_dist_liquid
 
 ggsave(filename = "../images/plots/avg_taste_dist_liquid.png", 
-       plot = avg_taste_dist_liquid, width = fig_width, height = fig_height, dpi = 300)
+       plot = avg_taste_dist_liquid, width = fig_width, height = fig_height, dpi = fig_dpi)
 ```
 ```{r}
 # Color Distribution by Hole Treatment (Density Plot)
@@ -192,11 +196,11 @@ color_liquid <- banana_data |>
 
 color_hole
 ggsave(filename = "../images/plots/color_hole.png", 
-       plot = color_hole, width = fig_width, height = fig_height, dpi = 300)
+       plot = color_hole, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 color_liquid
 ggsave(filename = "../images/plots/color_liquid.png", 
-       plot = color_liquid, width = fig_width, height = fig_height, dpi = 300)
+       plot = color_liquid, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 ```
 
@@ -231,7 +235,7 @@ avg_long_df$Taster <- recode(avg_long_df$Taster,
 # Plot the faceted heatmaps for each taster's average taste rating and overall average by treatment
 taste_by_treatment <- ggplot(avg_long_df, aes(x = liquid_treatment, y = hole_treatment, fill = Taste)) +
   geom_tile(color = "white") +  # Create the heatmap tiles
-  scale_fill_gradient(name = "Color Scale", low = "green", high = "brown") +  # Custom gradient from green to brown
+  scale_fill_gradient(name = "Taste Scale", low = "green", high = "brown") +  # Custom gradient from green to brown
   labs(
     title = "Heatmaps of Average Taste Ratings by Treatment Levels",
     x = "Liquid Treatment",
@@ -247,7 +251,7 @@ taste_by_treatment <- ggplot(avg_long_df, aes(x = liquid_treatment, y = hole_tre
 # Plot the heatmap for color ratings by treatment
 color_by_treatment <- ggplot(avg_by_treatment, aes(x = liquid_treatment, y = hole_treatment, fill = avg_color)) +
   geom_tile(color = "white") +  # Create the heatmap tiles
-  scale_fill_gradient(name = "Color Scale", low = "green", high = "brown") +  # Custom gradient from green to brown
+  scale_fill_gradient(name = "Taste Scale", low = "green", high = "brown") +  # Custom gradient from green to brown
   labs(
     title = "Heatmaps of Average Color Ratings by Treatment Levels",
     x = "Liquid Treatment",
@@ -261,11 +265,11 @@ color_by_treatment <- ggplot(avg_by_treatment, aes(x = liquid_treatment, y = hol
 
 taste_by_treatment
 ggsave(filename = "../images/plots/taste_by_treatment.png", 
-       plot = taste_by_treatment, width = fig_width, height = fig_height, dpi = 300)
+       plot = taste_by_treatment, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 color_by_treatment
 ggsave(filename = "../images/plots/color_by_treatment.png", 
-       plot = color_by_treatment, width = fig_width, height = fig_height, dpi = 300)
+       plot = color_by_treatment, width = fig_width, height = fig_height, dpi = fig_dpi)
 ```
 
 ```{r}
@@ -306,11 +310,11 @@ avg_color_hole <- avg_by_treatment |>
 
 avg_taste_hole
 ggsave(filename = "../images/plots/avg_taste_hole.png", 
-       plot = avg_taste_hole, width = fig_width, height = fig_height, dpi = 300)
+       plot = avg_taste_hole, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 avg_color_hole
 ggsave(filename = "../images/plots/avg_color_hole.png", 
-       plot = avg_color_hole, width = fig_width, height = fig_height, dpi = 300)
+       plot = avg_color_hole, width = fig_width, height = fig_height, dpi = fig_dpi)
 ```
 
 ```{r}
@@ -351,9 +355,9 @@ avg_color_liquid <- avg_by_treatment |>
 
 avg_taste_liquid
 ggsave(filename = "../images/plots/avg_taste_liquid.png", 
-       plot = avg_taste_liquid, width = fig_width, height = fig_height, dpi = 300)
+       plot = avg_taste_liquid, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 avg_color_liquid
 ggsave(filename = "../images/plots/avg_color_liquid.png", 
-       plot = avg_color_liquid, width = fig_width, height = fig_height, dpi = 300)
+       plot = avg_color_liquid, width = fig_width, height = fig_height, dpi = fig_dpi)
 ```
