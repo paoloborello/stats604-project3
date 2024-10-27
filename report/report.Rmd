@@ -1,0 +1,30 @@
+---
+title: "Report"
+author: "Julian Bernado, Paolo Borello, Feifan Jiang, Judy Wu"
+date: "2024-10-27"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Report Project 3
+
+## Introduction
+
+## Research Questions
+
+## Experimental Design
+
+### Randomization & Blocking Scheme
+
+### Evaluating Outcomes
+
+## Results
+
+### EDA
+
+### Planned Tests and Reported p-values
+
+## Conclusion
