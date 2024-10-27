@@ -21,10 +21,104 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Evaluating Outcomes
 
-## Results
+## Data Analysis
 
-### EDA
+### Data Format
+
+In this section, we display the format of data from the designed experiment. 
+
+The dataset has 30 rows and 10 columns, with each row containing the information on an individual sample of banana. The features and their descriptions are as follows:
+
+- **ID**: An identifier for each banana sample.
+- **row** and **column**: Indicators of the sample’s spatial position in the experiment. **row** indicates the number of shelf that the sample is on and **column** indicates the location within shelf.
+- **treatment_idx**: An index representing the specific treatment combination applied to each sample. 
+- **hole_treatment**: A categorical variable with two levels (`H`, `NH`), indicating whether the banana sample underwent a "hole" treatment. For example, `H` denotes that the hole treatment was applied to the sample.
+- **liquid_treatment**: Another categorical variable with three levels, representing the type of liquid treatment applied to the sample. **NL** denotes that no liquid treatment was applied, **DC** denotes that diet coke was appleid to the sample and **M** denotes that milk was applied.
+- **color**: A numerical value representing the color score of the banana. This value is obtained by the method described in the evaluation section.
+- **taste_1**, **taste_2**, and **taste_3**: Subjective taste scores for the banana sample, recorded across three different tasters. 
+
+In our study, we use **color** and the average taste score as the assessment for banana ripeness. The average taste score is the mean of **taste_1**, **taste_2**, and **taste_3** values.
+ 
+
+### Exploratory Data Analysis
+
+To explore the initial patterns in our data, we conducted an Exploratory Data Analysis using heatmaps and distribution plots to assess the spatial patterns and the effects of treatment on color and taste, which are the indicators of banana ripeness.
+
+We began by examining whether the position of bananas on shelves affeced the taste and color. Heatmaps of taste and color ratings by row and columns were created to visualize the potential spatial effects. From the heatmaps, no discrenible patterns were observed, which indicates that the spatial location of samples did not have a significant impact on the ripening process in terms of taste and color. This allowed us to proceed to further analysis without needing to account for spatial location as a confounding factor.
+
+![Heatmap of Color and Taste Ratings by Row and Column](../images/heatmaps.png)
+
+Next, we focused on the effects of the hole treatment on average taste and color. The distribution plot of average taste showed that bananas with holes teneded to have slightly higher ratings compared to those without holes. This suggests that the hole treatment may have accelearted the ripening process, potentially enhancing the flavor or texture, resulting in higher scores. Similar trend appeared in the distribution plot of color. Bananass with holes turned darker more quickly, inidicating a faster ripening. This finding further supports the idea that the hole treatment can influence banana ripening process.
+
+![Distribution Plots across Hole Treatment](../images/hole.png)
+
+
+
+We also analyzed the effect of liquid treatments on taste and color by examining the distribution plots across different treatments. The results related to showed minimal variation in both color and taste ratings among the liquid treatments, suggesting that the type of liquid did not significantly impact the taste of the bananas. 
+
+![Distribution Plots across Liquid Treatments](../images/liquid.png)
+
+Building on these initial observations from the exploratory data analysis, we proceeded with statistical testing to rigorously evaluate the effects of each treatment on banana ripeness, focusing specifically on their impact on color and taste. 
+
 
 ### Planned Tests and Reported p-values
 
+To assess the impact of the hole treatment and liquid treatments on fruit ripeness, several permutation-based tests was employed for the data analysis. 
+
+**Blocked Permutation Test**: The blocked permutation test was conducted to control the potential confounders related to the bunches of bananas. In the test, we use the differences in average assessment metrics (color or taste) between each single treatment group and control group. By permuting within blocks, we ensured that any differences observe could be attributed more confidently to the treatment effect rather than the differences between bunches. 
+
+
+**Permutation ANOVA for Liquid Treatment**: We also used permutation ANOVA to assess the overall differences between multiple treatment groups, specifically for evaluating the liquid treatments. Since we have two different types of liquid treatments, this method allowed us to test for significant differences across the three levels (control, diet coke and milk) related to banana ripeness. Same as the blocked permutation test, we incorporated blocking by bunch to account for the variability among different banana bunches to ensure that the observed effect is not confounded by the differences between bunches.
+
+**Permutation ANOVA with Interaction**: Permutation ANOVA with interaction was also conducted to explore whether the hole treatment interacts with the liquid treatments in influencing banana ripeness. This analysis aims to identify any effects between the hole and liquid treatments, which could reveal complex interactions that affect ripeness beyond the main effects of each single treatment. By permuting the data to test for interaction terms, this approach offers a flexible way to explore whether the combination of treatments produces an impact on ripeness that differs from the effects of each treatment independently.
+
+
+The following part displays the result from the permutation tests.
+
+#### Color Assessment
+
+The following table displays the results for color assessment for banana ripeness. 
+
+| Test                  | Treatment    | p-value |
+|-----------------------|-------------|---------|
+| Blocked Permutation   | Hole        | **0.015** |
+| Blocked Permutation   | Diet Coke   | 0.101   |
+| Blocked Permutation   | Milk        | 0.169   |
+| Blocked ANOVA         | All Liquid  | 0.585   |
+| ANOVA with Interaction| Hole & Liquid | **0.040** |
+
+The color assessment for banana ripeness showed notable effects of some treatments. The blocked permutation test for the hole treatment revealed a significant difference in color between bananas with and without holes, with a p-value of 0.015. This indicates that the hole treatment alone altering the ripening process.
+
+For the Diet Coke and Milk treatments, the blocked permutation tests did not show a significant impact on color, with p-values of 0.101 and 0.169, respectively. This suggests that these liquid treatments individually do not strongly influence banana ripeness in terms of color. Moreover, the blocked ANOVA for the liquid treatments yielded a p-value of 0.585, which confirmed that, as a group, the liquid treatments did not significantly impact color.
+
+However, the ANOVA with interaction analysis showed a significant interaction effect between the hole and liquid treatments, with a p-value of 0.040. This result suggests that the combination of hole and liquid treatments may affect ripening in a way that neither treatment does alone.
+In summary, the hole treatment alone significantly affects banana color, and there may be an interaction effect when combined with liquid treatments.
+
+
+#### Taste Assessment
+
+In the taste assessment, we observed that neither the hole treatment nor the liquid treatments had a statistically significant effect on the ripeness pace as measured by taste. 
+
+The blocked permutation test for the hole treatment yielded a p-value of 0.375, indicating no significant difference in taste between bananas with and without holes. Similarly, the blocked permutation tests for the liquid treatments (Diet Coke and Milk) produced p-values of 0.303 and 0.126, respectively, suggesting that these treatments did not significantly impact taste.
+
+The lack of significance from the blocked ANOVA further supports the conclusion that, collectively, the liquid treatments do not influence banana taste in terms of ripeness, with a p-value equals to 0.585.
+
+Finally, the ANOVA with interaction test, used to examine potential interactions between the hole and liquid treatments, returned a p-value of 0.346. This indicates that there was no significant interaction effect between the two types of treatments on taste.
+
+
+| Test                  | Treatment    | p-value |
+|-----------------------|-------------|---------|
+| Blocked Permutation   | Hole        | 0.375   |
+| Blocked Permutation   | Diet Coke   | 0.303   |
+| Blocked Permutation   | Milk        | 0.126   |
+| Blocked ANOVA         | All Liquid  | 0.585   |
+| ANOVA with Interaction| Hole & Liquid | 0.346   |
+
+
 ## Conclusion
+
+Our findings from permutation tests indicate that the impact of treatments on banana ripening varies depending on the metric used to assess ripeness. When using color as the measure, poking holes in bananas significantly alters the ripening process. In contrast, the liquid treatments, whether Diet Coke or milk, did not significantly affect the ripening pace based on color. Additionally, there was a significant interaction between the hole and liquid treatments, indicating a complex relationship that influenced color in a way that neither treatment alone achieved.
+
+However, when assessing ripeness through taste, neither poking holes nor dipping bananas in Diet Coke or milk had a significant effect on the ripening pace. Furthermore, no significant interaction effect was observed between these two treatments with respect to taste.
+
+In summary, our study demonstrates that poking holes in bananas can influence the ripening process to some extent, while the liquid treatments we tested did not have a notable effect. The interaction between hole and liquid treatments showed a more complex impact on color but not on taste, highlighting how different metrics may reveal different aspects of the ripening process.
