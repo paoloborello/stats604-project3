@@ -46,17 +46,17 @@ To explore the initial patterns in our data, we conducted an Exploratory Data An
 
 We began by examining whether the position of bananas on shelves affeced the taste and color. Heatmaps of taste and color ratings by row and columns were created to visualize the potential spatial effects. From the heatmaps, no discrenible patterns were observed, which indicates that the spatial location of samples did not have a significant impact on the ripening process in terms of taste and color. This allowed us to proceed to further analysis without needing to account for spatial location as a confounding factor.
 
-![Heatmap of Color and Taste Ratings by Row and Column](../images/heatmaps.png)
+![Heatmap of Color and Taste Ratings by Row and Column](../images/plots/heatmaps_pos.png)
 
 Next, we focused on the effects of the hole treatment on average taste and color. The distribution plot of average taste showed that bananas with holes teneded to have slightly higher ratings compared to those without holes. This suggests that the hole treatment may have accelearted the ripening process, potentially enhancing the flavor or texture, resulting in higher scores. Similar trend appeared in the distribution plot of color. Bananass with holes turned darker more quickly, inidicating a faster ripening. This finding further supports the idea that the hole treatment can influence banana ripening process.
 
-![Distribution Plots across Hole Treatment](../images/hole.png)
+![Distribution Plots across Hole Treatment](../images/plots/combined_dist_hole.png)
 
 
 
 We also analyzed the effect of liquid treatments on taste and color by examining the distribution plots across different treatments. The results related to showed minimal variation in both color and taste ratings among the liquid treatments, suggesting that the type of liquid did not significantly impact the taste of the bananas. 
 
-![Distribution Plots across Liquid Treatments](../images/liquid.png)
+![Distribution Plots across Liquid Treatments](../images/plots/combined_dist_liquid.png)
 
 Building on these initial observations from the exploratory data analysis, we proceeded with statistical testing to rigorously evaluate the effects of each treatment on banana ripeness, focusing specifically on their impact on color and taste. 
 

@@ -102,6 +102,8 @@ ggsave(filename = "../images/plots/taste_by_pos.png",
        plot = taste_by_pos, width = fig_width, height = fig_height, dpi = fig_dpi)
 ```
 
+
+
 ```{r}
 # Plot the distribution of taste by hole treatment and facet wrap by taster
 taste_dist_by_taster_hole <- taste_long_df |>
@@ -136,6 +138,7 @@ avg_taste_dist_hole
 
 ggsave(filename = "../images/plots/avg_taste_dist_hole.png", 
        plot = avg_taste_dist_hole, width = fig_width, height = fig_height, dpi = fig_dpi)
+
 
 ```
 ```{r}
@@ -203,6 +206,8 @@ ggsave(filename = "../images/plots/color_liquid.png",
        plot = color_liquid, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 ```
+
+
 
 ```{r}
 # Calculate the average taste and color for each taster and overall by treatment (hole + liquid)
@@ -360,4 +365,64 @@ ggsave(filename = "../images/plots/avg_taste_liquid.png",
 avg_color_liquid
 ggsave(filename = "../images/plots/avg_color_liquid.png", 
        plot = avg_color_liquid, width = fig_width, height = fig_height, dpi = fig_dpi)
+```
+
+### Combined plots for report
+
+```{r}
+library(gridExtra)
+color_by_pos <- ggplot(banana_data, aes(x = column, y = row, fill = color)) +
+  geom_tile(color = "white") +  # Create the heatmap tiles
+  scale_fill_gradient(name = "Color Scale", low = "green", high = "brown") +  # Custom gradient from green to brown
+  labs(
+    title = "Heatmap of Color Over Position",
+    x = "Column (Position on Shelf)",
+    y = "Row (Shelf Number)"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 0, hjust = 1),  # Rotate x-axis labels for clarity
+    plot.title = element_text(hjust = 0.5)  # Center the plot title
+  ) +
+  scale_y_reverse()
+taste_by_pos <- ggplot(taste_long_df, aes(x = column, y = row, fill = Taste)) +
+  geom_tile(color = "white") +  # Create the heatmap tiles
+  scale_fill_gradient(name = "Taste Scale", low = "green", high = "brown") +
+  labs(
+    title = "Heatmaps of Taste Ratings by Position",
+    x = "Column (Position on Shelf)",
+    y = "Row (Shelf Number)"
+  ) +
+  facet_wrap(~ Taster, ncol = 2) +  # Facet by Taster and Average Taste
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 0, hjust = 1),  # Rotate x-axis labels for clarity
+    plot.title = element_text(hjust = 0.5)  # Center the plot title
+  ) + 
+  scale_y_reverse()
+combined_plot <- grid.arrange(color_by_pos, taste_by_pos, ncol = 2)
+fig_width = 10*0.75
+fig_height = 5*0.75
+fig_dpi = 400
+ggsave(filename = "../images/plots/heatmaps_pos.png", 
+       plot = combined_plot,width = fig_width, height = fig_height, dpi = fig_dpi)
+```
+
+
+```{r}
+combined_hole <- grid.arrange(color_hole, avg_taste_dist_hole, ncol = 2)
+fig_width = 15*0.75
+fig_height = 7.5*0.75
+fig_dpi = 400
+ggsave(filename = "../images/plots/combined_dist_hole.png", 
+       plot = combined_hole,width = fig_width, height = fig_height, dpi = fig_dpi)
+```
+
+```{r}
+combined_liquid <- grid.arrange(color_liquid, avg_taste_dist_liquid, ncol = 2)
+fig_width = 15*0.75
+fig_height = 7.5*0.75
+fig_dpi = 400
+ggsave(filename = "../images/plots/combined_dist_liquid.png", 
+       plot = combined_liquid,width = fig_width, height = fig_height, dpi = fig_dpi)
 ```
