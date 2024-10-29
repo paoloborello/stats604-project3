@@ -18,7 +18,7 @@ eda: $(OUTPUT_DIR) $(PLOTS_DIR) $(OUTPUT_DIR)/01_EDA.pdf
 # Tests rule: Render 02_Tests.Rmd to PDF
 tests: $(OUTPUT_DIR)/02_Tests.pdf
 
-# Report rule: Render the report located in the 'report' directory to PDF
+# Report rule: Render the report located in the 'report' directory to PDF in the output folder
 report: $(OUTPUT_DIR)/report.pdf
 
 # Rule to create the output directory if it does not exist
@@ -35,6 +35,11 @@ $(PLOTS_DIR):
 $(OUTPUT_DIR)/%.pdf: analysis/%.Rmd | $(OUTPUT_DIR) $(PLOTS_DIR)
 	@echo "Rendering $< to $@"
 	Rscript -e "rmarkdown::render('$<', output_format = 'pdf_document', output_file = '../$@')" || (echo "Error rendering $<"; exit 1)
+
+# Rule to render report.Rmd in the 'report' directory to PDF and place it in the output folder
+$(OUTPUT_DIR)/report.pdf: report/report.Rmd | $(OUTPUT_DIR)
+	@echo "Rendering report.Rmd to PDF in the output folder..."
+	Rscript -e "rmarkdown::render('report/report.Rmd', output_format = 'pdf_document', output_file = '../$(OUTPUT_DIR)/report.pdf')" || (echo "Error rendering report.Rmd"; exit 1)
 
 # Rule to clean PDF files and delete the plots folder and its PNG files
 clean:

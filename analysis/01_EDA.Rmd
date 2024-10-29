@@ -34,7 +34,7 @@ treatmant_assignment <- ggplot(treatment_data, aes(x = column, y = row, fill = t
 
 treatmant_assignment
 
-ggsave(filename = "../images/plots/treatmant_assignment.png", 
+ggsave(filename = "../images/plots/treatment_assignment.png", 
        plot = treatmant_assignment, width = fig_width, height = fig_height, dpi = fig_dpi)
 ```
 
