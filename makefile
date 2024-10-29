@@ -9,8 +9,15 @@ OUTPUT_DIR := output
 # Plots directory (within the output folder)
 PLOTS_DIR := $(OUTPUT_DIR)/plots
 
-# Default rule: Create output directory, plots directory, and render Rmd files to PDF
-all: $(OUTPUT_DIR) $(PLOTS_DIR) $(RMD_FILES:analysis/%.Rmd=$(OUTPUT_DIR)/%.pdf)
+# Default rule: Run data, EDA, tests, and report in sequence
+all: data eda tests report
+
+# Data rule: Run the specified .R scripts in order within the data folder
+data: $(OUTPUT_DIR)
+	@echo "Running data processing scripts..."
+	Rscript data/randomization.R
+	Rscript data/dataset.R
+	@echo "Data processing completed."
 
 # EDA rule: Create directories and render only 01_EDA.Rmd to PDF
 eda: $(OUTPUT_DIR) $(PLOTS_DIR) $(OUTPUT_DIR)/01_EDA.pdf
