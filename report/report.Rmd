@@ -8,6 +8,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+plot_folder = "../output/plots/"
 ```
 
 
@@ -63,7 +64,7 @@ Our experimental design thus yielded the following distribution across treatment
 The experiment was conducted in a windowless, climate-controlled room to eliminate confounders such as UV exposure. Each bunch was placed on a separate shelf of a vertical shelving unit to control for potential temperature gradients in the air column (with warmer air generally near the ceiling). Treatment assignments were randomized using the script `./data/randomization.R`, resulting in the following spatial arrangement:
 
 ```{r, echo=FALSE, fig.align='center', out.width='60%', fig.cap="Spatial layout of treatment assignment for bananas."}
-knitr::include_graphics("../images/plots/treatment_assignment.png")
+knitr::include_graphics(file.path(plot_folder, "treatment_assignment.png"))
 ```
 
 Following treatment, the bananas were placed on paper towel-lined shelves to absorb any residual liquid and were left undisturbed for a period of 3 days, allowing for consistent observation of ripening changes across all treatment groups.
@@ -98,13 +99,13 @@ To explore the initial patterns in our data, we conducted an Exploratory Data An
 We began by examining whether the position of bananas on shelves affeced the taste and color. Heatmaps of taste and color ratings by row and columns were created to visualize the potential spatial effects (Figure \ref{fig:heatmaps_pos}). From the heatmaps, no discernible patterns were observed, which indicates that the spatial location of samples did not have a significant impact on the ripening process in terms of taste and color. This allowed us to proceed to further analysis without needing to account for spatial location as a confounding factor.
 
 ```{r heatmaps_pos, echo=FALSE, fig.align='center', out.width='100%', fig.cap="Heatmap of Color and Taste Ratings by Row and Column."}
-knitr::include_graphics("../images/plots/heatmaps_pos.png")
+knitr::include_graphics(file.path(plot_folder, "heatmaps_pos.png"))
 ```
 
 Next, we focused on the effects of the hole treatment on average taste and color (Figure \ref{fig:combined_dist_hole}). The distribution plot of average taste showed that bananas with holes tended to have slightly higher ratings compared to those without holes. This suggests that the hole treatment may have accelerated the ripening process, potentially enhancing the flavor or texture, resulting in higher scores. Similar trend appeared in the distribution plot of color. Bananas with holes turned darker more quickly, indicating a faster ripening. This finding further supports the idea that the hole treatment can influence banana ripening process.
 
 ```{r combined_dist_hole, echo=FALSE, fig.align='center', out.width='100%', fig.cap="Distribution Plots across Hole Treatment."}
-knitr::include_graphics("../images/plots/combined_dist_hole.png")
+knitr::include_graphics(file.path(plot_folder, "combined_dist_hole.png"))
 ```
 
 
@@ -112,7 +113,7 @@ knitr::include_graphics("../images/plots/combined_dist_hole.png")
 We also analyzed the effect of liquid treatments on taste and color by examining the distribution plots across different treatments (Figure \ref{fig:combined_dist_liquid}). The results related to showed minimal variation in both color and taste ratings among the liquid treatments, suggesting that the type of liquid did not significantly impact the taste of the bananas. 
 
 ```{r combined_dist_liquid, echo=FALSE, fig.align='center', out.width='100%', fig.cap="Distribution Plots across Liquid Treatments."}
-knitr::include_graphics("../images/plots/combined_dist_liquid.png")
+knitr::include_graphics(file.path(plot_folder, "combined_dist_liquid.png"))
 ```
 
 Building on these initial observations from the exploratory data analysis, we proceeded with statistical testing to rigorously evaluate the effects of each treatment on banana ripeness, focusing specifically on their impact on color and taste. 

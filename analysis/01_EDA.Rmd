@@ -8,6 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+plot_folder <- "../output/plots"
 ```
 
 ```{r}
@@ -34,7 +35,7 @@ treatmant_assignment <- ggplot(treatment_data, aes(x = column, y = row, fill = t
 
 treatmant_assignment
 
-ggsave(filename = "../images/plots/treatment_assignment.png", 
+ggsave(filename = file.path(plot_folder, "treatment_assignment.png"), 
        plot = treatmant_assignment, width = fig_width, height = fig_height, dpi = fig_dpi)
 ```
 
@@ -57,7 +58,7 @@ color_by_pos <- ggplot(banana_data, aes(x = column, y = row, fill = color)) +
 
 color_by_pos
 
-ggsave(filename = "../images/plots/color_by_pos.png", 
+ggsave(filename = file.path(plot_folder, "color_by_pos.png"), 
        plot = color_by_pos, width = fig_width, height = fig_height, dpi = fig_dpi)
 ```
 
@@ -98,7 +99,7 @@ taste_by_pos <- ggplot(taste_long_df, aes(x = column, y = row, fill = Taste)) +
 
 taste_by_pos
 
-ggsave(filename = "../images/plots/taste_by_pos.png", 
+ggsave(filename = file.path(plot_folder, "taste_by_pos.png"), 
        plot = taste_by_pos, width = fig_width, height = fig_height, dpi = fig_dpi)
 ```
 
@@ -131,12 +132,12 @@ avg_taste_dist_hole <- taste_long_df |>
 
 taste_dist_by_taster_hole
 
-ggsave(filename = "../images/plots/taste_dist_by_taster_hole.png", 
+ggsave(filename = file.path(plot_folder, "taste_dist_by_taster_hole.png"), 
        plot = taste_dist_by_taster_hole, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 avg_taste_dist_hole
 
-ggsave(filename = "../images/plots/avg_taste_dist_hole.png", 
+ggsave(filename = file.path(plot_folder, "avg_taste_dist_hole.png"), 
        plot = avg_taste_dist_hole, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 
@@ -167,12 +168,12 @@ avg_taste_dist_liquid <- taste_long_df |>
   theme(plot.title = element_text(hjust = 0.5))  # Center the plot title
 
 taste_dist_by_taster_liquid
-ggsave(filename = "../images/plots/taste_dist_by_taster_liquid.png", 
+ggsave(filename = file.path(plot_folder, "taste_dist_by_taster_liquid.png"), 
        plot = taste_dist_by_taster_liquid, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 avg_taste_dist_liquid
 
-ggsave(filename = "../images/plots/avg_taste_dist_liquid.png", 
+ggsave(filename = file.path(plot_folder, "avg_taste_dist_liquid.png"), 
        plot = avg_taste_dist_liquid, width = fig_width, height = fig_height, dpi = fig_dpi)
 ```
 ```{r}
@@ -198,11 +199,11 @@ color_liquid <- banana_data |>
 
 
 color_hole
-ggsave(filename = "../images/plots/color_hole.png", 
+ggsave(filename = file.path(plot_folder, "color_hole.png"), 
        plot = color_hole, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 color_liquid
-ggsave(filename = "../images/plots/color_liquid.png", 
+ggsave(filename = file.path(plot_folder, "color_liquid.png"), 
        plot = color_liquid, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 ```
@@ -269,11 +270,11 @@ color_by_treatment <- ggplot(avg_by_treatment, aes(x = liquid_treatment, y = hol
   )
 
 taste_by_treatment
-ggsave(filename = "../images/plots/taste_by_treatment.png", 
+ggsave(filename = file.path(plot_folder, "taste_by_treatment.png"), 
        plot = taste_by_treatment, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 color_by_treatment
-ggsave(filename = "../images/plots/color_by_treatment.png", 
+ggsave(filename = file.path(plot_folder, "color_by_treatment.png"), 
        plot = color_by_treatment, width = fig_width, height = fig_height, dpi = fig_dpi)
 ```
 
@@ -314,11 +315,11 @@ avg_color_hole <- avg_by_treatment |>
   )
 
 avg_taste_hole
-ggsave(filename = "../images/plots/avg_taste_hole.png", 
+ggsave(filename = file.path(plot_folder, "avg_taste_hole.png"), 
        plot = avg_taste_hole, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 avg_color_hole
-ggsave(filename = "../images/plots/avg_color_hole.png", 
+ggsave(filename = file.path(plot_folder, "avg_color_hole.png"), 
        plot = avg_color_hole, width = fig_width, height = fig_height, dpi = fig_dpi)
 ```
 
@@ -359,11 +360,11 @@ avg_color_liquid <- avg_by_treatment |>
   )
 
 avg_taste_liquid
-ggsave(filename = "../images/plots/avg_taste_liquid.png", 
+ggsave(filename = file.path(plot_folder, "avg_taste_liquid.png"), 
        plot = avg_taste_liquid, width = fig_width, height = fig_height, dpi = fig_dpi)
 
 avg_color_liquid
-ggsave(filename = "../images/plots/avg_color_liquid.png", 
+ggsave(filename = file.path(plot_folder, "avg_color_liquid.png"), 
        plot = avg_color_liquid, width = fig_width, height = fig_height, dpi = fig_dpi)
 ```
 
@@ -404,7 +405,7 @@ combined_plot <- grid.arrange(color_by_pos, taste_by_pos, ncol = 2)
 fig_width = 10*0.75
 fig_height = 5*0.75
 fig_dpi = 400
-ggsave(filename = "../images/plots/heatmaps_pos.png", 
+ggsave(filename = file.path(plot_folder, "heatmaps_pos.png"), 
        plot = combined_plot,width = fig_width, height = fig_height, dpi = fig_dpi)
 ```
 
@@ -414,7 +415,7 @@ combined_hole <- grid.arrange(color_hole, avg_taste_dist_hole, ncol = 2)
 fig_width = 15*0.75
 fig_height = 7.5*0.75
 fig_dpi = 400
-ggsave(filename = "../images/plots/combined_dist_hole.png", 
+ggsave(filename = file.path(plot_folder, "combined_dist_hole.png"), 
        plot = combined_hole,width = fig_width, height = fig_height, dpi = fig_dpi)
 ```
 
@@ -423,6 +424,6 @@ combined_liquid <- grid.arrange(color_liquid, avg_taste_dist_liquid, ncol = 2)
 fig_width = 15*0.75
 fig_height = 7.5*0.75
 fig_dpi = 400
-ggsave(filename = "../images/plots/combined_dist_liquid.png", 
+ggsave(filename = file.path(plot_folder, "combined_dist_liquid.png"), 
        plot = combined_liquid,width = fig_width, height = fig_height, dpi = fig_dpi)
 ```

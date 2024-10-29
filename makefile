@@ -6,8 +6,8 @@ RMD_FILES := $(wildcard analysis/*.Rmd)
 # Output directory for the rendered files
 OUTPUT_DIR := output
 
-# Plots directory (within the pre-existing images folder)
-PLOTS_DIR := images/plots
+# Plots directory (within the output folder)
+PLOTS_DIR := $(OUTPUT_DIR)/plots
 
 # Default rule: Create output directory, plots directory, and render Rmd files to PDF
 all: $(OUTPUT_DIR) $(PLOTS_DIR) $(RMD_FILES:analysis/%.Rmd=$(OUTPUT_DIR)/%.pdf)
@@ -28,7 +28,7 @@ $(OUTPUT_DIR):
 
 # Rule to create the plots directory if it does not exist
 $(PLOTS_DIR):
-	@echo "Creating plots directory inside images..."
+	@echo "Creating plots directory inside output..."
 	mkdir -p $(PLOTS_DIR)
 
 # Rule to render each Rmd file in the analysis folder to PDF and place the output in the output folder
@@ -47,6 +47,15 @@ clean:
 	@if [ -d $(OUTPUT_DIR) ]; then \
 		echo "Removing PDF files..."; \
 		rm -rf $(OUTPUT_DIR)/*.pdf; \
+		if [ -d $(PLOTS_DIR) ]; then \
+			echo "Removing plot PNG files..."; \
+			rm -rf $(PLOTS_DIR)/*.png; \
+			if [ -z "$$(ls -A $(PLOTS_DIR))" ]; then \
+				rmdir $(PLOTS_DIR); \
+			else \
+				echo "$(PLOTS_DIR) is not empty, skipping directory removal."; \
+			fi \
+		fi; \
 		if [ -z "$$(ls -A $(OUTPUT_DIR))" ]; then \
 			rmdir $(OUTPUT_DIR); \
 		else \
@@ -54,16 +63,5 @@ clean:
 		fi \
 	else \
 		echo "$(OUTPUT_DIR) does not exist, skipping PDF cleanup."; \
-	fi
-	@if [ -d $(PLOTS_DIR) ]; then \
-		echo "Removing plot PNG files..."; \
-		rm -rf $(PLOTS_DIR)/*.png; \
-		if [ -z "$$(ls -A $(PLOTS_DIR))" ]; then \
-			rmdir $(PLOTS_DIR); \
-		else \
-			echo "$(PLOTS_DIR) is not empty, skipping directory removal."; \
-		fi \
-	else \
-		echo "$(PLOTS_DIR) does not exist, skipping plot cleanup."; \
 	fi
 	@echo "Cleanup completed."
