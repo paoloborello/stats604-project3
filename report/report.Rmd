@@ -1,5 +1,5 @@
 ---
-title: "On the Ripeness of Bananas: an empirical study"
+title: "On the Ripeness of Bananas: an Empirical Study"
 author: "Julian Bernado, Paolo Borello, Feifan Jiang, Judy Wu"
 date: "2024-10-27"
 output: 
@@ -51,7 +51,7 @@ To maximize sample size and allow for the analysis of potential interaction effe
 
 ## Randomization and Blocking Scheme
 
-With a budget of $7, and taking into account local grocery prices in Ann Arbor, we were able to acquire 30 bananas. Given our 6 ($2 \times 3$) treatment combinations, this allowed us to conduct the experiment with 5 replicates per combined treatment condition. To minimize confounding factors such as genetic variation, initial ripeness, and sourcing origin, each replicate was selected from the same bunch of bananas, yielding 5 bunches of 6 bananas each and ensuring consistency across treatment conditions.
+With a budget of \$7, and taking into account local grocery prices in Ann Arbor, we were able to acquire 30 bananas. Given our 6 ($2 \times 3$) treatment combinations, this allowed us to conduct the experiment with 5 replicates per combined treatment condition. To minimize confounding factors such as genetic variation, initial ripeness, and sourcing origin, each replicate was selected from the same bunch of bananas, yielding 5 bunches of 6 bananas each and ensuring consistency across treatment conditions.
 
 Our experimental design thus yielded the following distribution across treatment conditions:
 
@@ -70,6 +70,30 @@ knitr::include_graphics(file.path(plot_folder, "treatment_assignment.png"))
 Following treatment, the bananas were placed on paper towel-lined shelves to absorb any residual liquid and were left undisturbed for a period of 3 days, allowing for consistent observation of ripening changes across all treatment groups.
 
 ## Evaluating Outcomes
+While ripeness in bananas can be assessed via chemical tests or the use of pre-trained black-box models, we aimed to design outcomes that (1) did not use outside data and (2) fit in our budget constraints. Furthermore, domain stakeholders (i.e. people who eat bananas) typically care about ripeness only in-so-far as it affects the taste of bananas. To that end, we chose a largely subjective taste assessment and a somewhat more objective color assessment which we will explain in detail in the following sections.
+
+### Taste
+
+<center>
+
+![Original banana pictures](../images/bananas/example_banana.png)
+
+</center>
+
+<center>
+
+![Photoshopped banana picture](../images/bananas/11.png)
+
+</center>
+
+To evaluate taste, three of us tasted all 30 bananas and rated them on a ripeness scale from zero to five in increments of one half. Our fourth group member who did not taste the bananas administered the bananas to us in a random order. After drawing a random order of bananas to taste, the tasters sat in an orientation such that they could not see the bananas, while our fourth member cut the bananas into small, bite-sized pieces and brought them to us on a plate. This setup can be considered a single-blinded as the tasters were unaware of which banana we were tasting, while our fourth group member was aware. However, there was minimal interaction from our fourth group member such that we don't expect our results to be different than had we used an intermediary unaware of the different treatment conditions.  
+
+After collecting three ratings for each of the thirty bananas, for each banana we averaged the three scores to come up with a final taste outcome $O_t \in [0, 5]$ for each banana. 
+
+### Color
+To evaluate color, we took a picture of each banana prior to tasting. The pictures were taken in the exact same setting within five minutes of one another with identical light conditions and banana orientation. After getting a picture of each banana, we used Photoshop to remove the background and the black part of each stem. We removed stems because different bananas had significantly different amounts of black toward the end of the stem simply as a result of how the bananas were separated from their bunch. Furthermore, the holes that we poked in the bananas left small but noticeable black dots surrounding the puncture point. These darkened parts were removed using the clone stamp tool in Photoshop by filling them in with the surrounding color of the banana. The holes were removed because while they did change the color of the banana at the puncture points, they did not seem to be of biological nor culinary interest. The photo-editing process is pictured above.
+
+After transparent images of each banana were created, we used the `magick` package in `R` to calculate the average (R,G,B) value of each photo. From here, we used a reference image that detailed the different stages of ripeness, pictured above. We took the 6 reference values as points $p_1, p_2, \dots, p_6 \in \mathbb{R}^3$. Then, we considered the line segments $l_1, l_2, ..., l_5$ where $l_i$ starts at $p_i$ and ends at $p_{i+1}$. Let us call the union of these line segments $L = \bigcup_{i=1}^5 l_i$. Then, we projected each banana point $\{b_i\}_{i=1}^{30}$ in (R,G,B) space onto $L$. For all projected points $\{P_L(b_i)\}_{i=1}^{30}$ we calculated how far along $L$ the point was with $P_L(b_i) = p_1$ corresponding to 0 and $P_L(b_i) = p_6$ corresponding to 1. As such, our color outcome $O_c \in [0,1]$ for each banana.
 
 # Data Analysis
 
@@ -85,7 +109,7 @@ The dataset has 30 rows and 10 columns, with each row containing the information
 - **row** and **column**: Indicators of the sample’s spatial position in the experiment. **row** indicates the number of shelf that the sample is on and **column** indicates the location within shelf.
 - **treatment_idx**: An index representing the specific treatment combination applied to each sample. 
 - **hole_treatment**: A categorical variable with two levels (`H`, `NH`), indicating whether the banana sample underwent a "hole" treatment. For example, `H` denotes that the hole treatment was applied to the sample.
-- **liquid_treatment**: Another categorical variable with three levels, representing the type of liquid treatment applied to the sample. **NL** denotes that no liquid treatment was applied, **DC** denotes that diet coke was appleid to the sample and **M** denotes that milk was applied.
+- **liquid_treatment**: Another categorical variable with three levels, representing the type of liquid treatment applied to the sample. **NL** denotes that no liquid treatment was applied, **DC** denotes that diet coke was applied to the sample and **M** denotes that milk was applied.
 - **color**: A numerical value representing the color score of the banana. This value is obtained by the method described in the evaluation section.
 - **taste_1**, **taste_2**, and **taste_3**: Subjective taste scores for the banana sample, recorded across three different tasters. 
 
@@ -107,8 +131,6 @@ Next, we focused on the effects of the hole treatment on average taste and color
 ```{r combined_dist_hole, echo=FALSE, fig.align='center', out.width='100%', fig.cap="Distribution Plots across Hole Treatment."}
 knitr::include_graphics(file.path(plot_folder, "combined_dist_hole.png"))
 ```
-
-
 
 We also analyzed the effect of liquid treatments on taste and color by examining the distribution plots across different treatments (Figure \ref{fig:combined_dist_liquid}). The results related to showed minimal variation in both color and taste ratings among the liquid treatments, suggesting that the type of liquid did not significantly impact the taste of the bananas. 
 
