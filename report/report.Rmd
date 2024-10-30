@@ -80,27 +80,21 @@ After collecting three ratings for each of the thirty bananas, for each banana w
 
 ### Color
 
-<center>
+```{r, echo=FALSE, fig.align='center', out.width='30%', fig.cap="Original photo of a banana"}
+knitr::include_graphics(file.path("../images/bananas/", "example_banana.png"))
+```
 
-![Original banana pictures](../images/bananas/example_banana.png)
+```{r, echo=FALSE, fig.align='center', out.width='30%', fig.cap="Photoshopped photo of a banana"}
+knitr::include_graphics(file.path("../images/bananas/", "11.png"))
+```
 
-</center>
+To evaluate color, we took a picture of each banana prior to tasting. The pictures were taken in the exact same setting within five minutes of one another with identical light conditions and banana orientation. After getting a picture of each banana, we used Photoshop to remove the background and the black part of each stem. We removed stems because different bananas had significantly different amounts of black toward the end of the stem simply as a result of how the bananas were separated from their bunch. Furthermore, the holes that we poked in the bananas left small but noticeable black dots surrounding the puncture point. These darkened parts were removed using the clone stamp tool in Photoshop by filling them in with the surrounding color of the banana. The holes were removed because while they did change the color of the banana at the puncture points, they did not seem to be of biological nor culinary interest. The photo-editing process is pictured in figures 2 and 3.
 
-<center>
+```{r, echo=FALSE, fig.align='center', out.width='30%', fig.cap="Original photo of a banana"}
+knitr::include_graphics(file.path("../images/", "color_scale.jpg"))
+```
 
-![Photoshopped banana picture](../images/bananas/11.png)
-
-</center>
-
-To evaluate color, we took a picture of each banana prior to tasting. The pictures were taken in the exact same setting within five minutes of one another with identical light conditions and banana orientation. After getting a picture of each banana, we used Photoshop to remove the background and the black part of each stem. We removed stems because different bananas had significantly different amounts of black toward the end of the stem simply as a result of how the bananas were separated from their bunch. Furthermore, the holes that we poked in the bananas left small but noticeable black dots surrounding the puncture point. These darkened parts were removed using the clone stamp tool in Photoshop by filling them in with the surrounding color of the banana. The holes were removed because while they did change the color of the banana at the puncture points, they did not seem to be of biological nor culinary interest. The photo-editing process is pictured above.
-
-<center>
-
-![Banana color scale](../images/color_scale.jpg)
-
-</center>
-
-After transparent images of each banana were created, we used the `magick` package in `R` to calculate the average (R,G,B) value of each photo. From here, we used a reference image that detailed the different stages of ripeness, pictured above. We took the 6 reference values as points $p_1, p_2, \dots, p_6 \in \mathbb{R}^3$. Then, we considered the line segments $l_1, l_2, ..., l_5$ where $l_i$ starts at $p_i$ and ends at $p_{i+1}$. Let us call the union of these line segments $L = \bigcup_{i=1}^5 l_i$. Then, we projected each banana point $\{b_i\}_{i=1}^{30}$ in (R,G,B) space onto $L$. For all projected points $\{P_L(b_i)\}_{i=1}^{30}$ we calculated how far along $L$ the point was with $P_L(b_i) = p_1$ corresponding to 0 and $P_L(b_i) = p_6$ corresponding to 1. As such, our color outcome $O_c \in [0,1]$ for each banana.
+After transparent images of each banana were created, we used the `magick` package in `R` to calculate the average (R,G,B) value of each photo. From here, we used a reference image that detailed the different stages of ripeness, pictured in figure 4. We took the 6 reference values as points $p_1, p_2, \dots, p_6 \in \mathbb{R}^3$. Then, we considered the line segments $l_1, l_2, ..., l_5$ where $l_i$ starts at $p_i$ and ends at $p_{i+1}$. Let us call the union of these line segments $L = \bigcup_{i=1}^5 l_i$. Then, we projected each banana point $\{b_i\}_{i=1}^{30}$ in (R,G,B) space onto $L$. For all projected points $\{P_L(b_i)\}_{i=1}^{30}$ we calculated how far along $L$ the point was with $P_L(b_i) = p_1$ corresponding to 0 and $P_L(b_i) = p_6$ corresponding to 1. As such, our color outcome $O_c \in [0,1]$ for each banana.
 
 # Data Analysis
 
