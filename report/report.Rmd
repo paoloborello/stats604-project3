@@ -153,7 +153,7 @@ To assess the impact of the hole treatment and liquid treatments on fruit ripene
 **Permutation ANOVA with Interaction**: Permutation ANOVA with interaction was also conducted to explore whether the hole treatment interacts with the liquid treatments in influencing banana ripeness. This analysis aims to identify any effects between the hole and liquid treatments, which could reveal complex interactions that affect ripeness beyond the main effects of each single treatment. By permuting the data to test for interaction terms, this approach offers a flexible way to explore whether the combination of treatments produces an impact on ripeness that differs from the effects of each treatment independently.
 
 
-The following part displays the result from the permutation tests.
+We use an ANOVA analysis for the liquid treatments and interaction since there are more than two treatment conditions. The following part displays the result from the permutation tests.
 
 ### Color Assessment
 
