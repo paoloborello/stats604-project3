@@ -6,7 +6,7 @@ For more details on results and the experimental setup, please refer to the `pre
 
 ## Description
 
-This project creates datasets from banana images, performs exploratory analysis, runs statistical tests, and generates a PDF report. A Makefile is included to streamline the workflow, handling data processing, rendering `.Rmd` files, and managing output directories.
+This project creates datasets from banana images, performs exploratory analysis, runs statistical tests, and generates a PDF report. A ``Makefile`` is included to streamline the workflow, handling data processing, rendering `.Rmd` files, and managing output directories.
 
 ## Table of Contents
 - [Installation](#installation)
@@ -51,12 +51,12 @@ This command will:
 ## Makefile Targets
 
 The Makefile includes several targets to facilitate different steps of the workflow:
-•	``make all``: Installs dependencies, processes data, performs EDA, runs tests, and generates the report. This is the default target.
-•	``make install_requirements``: Installs R packages listed in requirements.txt.
-•	``make data``: Runs data processing scripts in the data folder.
-•	``make eda``: Creates necessary directories and renders the 01_EDA.Rmd file to PDF.
-•	``make tests``: Renders the 02_Tests.Rmd file to PDF.
-•	``make report``: Renders the report.Rmd file located in the report folder to PDF.
-•	``make clean``: Removes generated PDF files, plot PNGs, and cleans up the output and plots directories.
-
+ - ``make all``: Installs dependencies, processes data, performs EDA, runs tests, and generates the report. This is the default target.
+ - ``make install_requirements``: Installs R packages listed in requirements.txt.
+ - ``make data``: Runs data processing scripts in the data folder.
+ - ``make eda``: Creates necessary directories and renders the 01_EDA.Rmd file to PDF.
+ - ``make tests``: Renders the 02_Tests.Rmd file to PDF.
+ - ``make report``: Renders the report.Rmd file located in the report folder to PDF.
+ - ``make clean``: Removes generated PDF files, plot PNGs, and cleans up the output and plots directories.
+   
 Now, with a single make command, you can easily manage data processing, analysis, and report generation, helping streamline and simplify your study of banana ripeness.
