@@ -1,6 +1,10 @@
 # On the Ripeness of Bananas: An Empirical Study
 
-A project that studies the effect of poking holes and dipping bananas in various liquids on the ripening process.
+Accelerating fruit ripening through household methods is a common practice, yet the scientific basis of many
+such techniques remains underexplored. This study investigates the effectiveness of two straightforward
+interventions—poking holes in fruit and dipping it in different liquids—as potential methods to influence
+ripening rates. These methods were selected to assess whether minor physical modifications or exposure to
+common liquids can meaningfully alter the ripening process.
 
 For more details on results and the experimental setup, please refer to the `pre-experimental-plan.md` file and generate the final report PDF.
 
