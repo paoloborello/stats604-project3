@@ -1,4 +1,4 @@
-# Makefile to render all Rmd files and create output directory and plots folder
+# Makefile
 
 # List all Rmd files in the analysis folder
 RMD_FILES := $(wildcard analysis/*.Rmd)
@@ -10,12 +10,19 @@ OUTPUT_DIR := output
 PLOTS_DIR := $(OUTPUT_DIR)/plots
 
 # Default rule: Run data, EDA, tests, and report in sequence
-all: data eda tests report
+all: install_requirements data eda tests report
+
+# Install R packages from requirements.txt
+install_requirements:
+	@echo "Installing required R packages from requirements.txt..."
+	Rscript -e "packages <- readLines('requirements.txt'); install_if_missing <- function(pkg) { if (!requireNamespace(pkg, quietly = TRUE)) { install.packages(pkg, dependencies = TRUE) } }; sapply(packages, install_if_missing)"
+	@echo "R packages installed."
 
 # Data rule: Run the specified .R scripts in order within the data folder
 data: $(OUTPUT_DIR)
 	@echo "Running data processing scripts..."
 	Rscript data/randomization.R
+	Rscript data/collect_data.R
 	Rscript data/dataset.R
 	@echo "Data processing completed."
 

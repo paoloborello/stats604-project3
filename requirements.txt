@@ -1,0 +1,7 @@
+dplyr
+magick
+reshape2
+ggplot2
+tidyverse
+gridExtra
+bookdown

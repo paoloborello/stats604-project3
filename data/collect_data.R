@@ -22,8 +22,9 @@ tasting_order <- data.frame(row = row,
 
 # Now, we generate the color data
 mean_rgb <- function(banana_index){
-  image_path <- paste0("/Users/bernado/Desktop/academics/carcajou/classes/stats604/proj3/clean_bananas/", banana_index, ".png")
+  image_path <- paste0("./images/bananas/", banana_index, ".png")
   img <- image_read(image_path)
+  print(paste0("Reading image at ", image_path))
   dim(image_data(img))
   
   readable_red <- strtoi(image_data(img)[1,,], base = 16)
